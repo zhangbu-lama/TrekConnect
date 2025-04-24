@@ -15,7 +15,7 @@ const Activities = () => {
       title: "Trekking",
       image: trekImage,
       description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores veritatis dicta quis neque praesentium aut autem ducimus temporibus. Adipisci, fuga obcaecati! Aspernatur, dolores eaque dolorem delectus quasi architecto repellendus ratione.",
-      path: "/trekking",
+      path: "/Reusable",
     },
     {
       title: "Bouldering",
@@ -27,7 +27,7 @@ const Activities = () => {
       title: "Peak Climbing",
       image: peakImage,
       description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores veritatis dicta quis neque praesentium aut autem ducimus temporibus. Adipisci, fuga obcaecati! Aspernatur, dolores eaque dolorem delectus quasi architecto repellendus ratione.",
-      path: "/peak-climbing",
+      path: "/Reusable",
     },
   ];
 
