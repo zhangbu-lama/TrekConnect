@@ -129,7 +129,7 @@ export default function DetailsPage() {
 
         <div className="absolute top-6 left-6 z-10">
           <Link
-            to="/trekking"
+            to="/reusable"
             className="flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-full hover:bg-white/30 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -171,12 +171,7 @@ export default function DetailsPage() {
                 <span>{trek.bestSeason}</span>
               </div>
             </div>
-            <Link
-              to={`/trekking/${trek.id}/booking`}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-8 py-6 rounded-lg shadow-lg inline-block"
-            >
-              Book This Trek
-            </Link>
+
           </div>
         </div>
       </div>

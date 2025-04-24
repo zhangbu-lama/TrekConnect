@@ -70,7 +70,7 @@ export default function BookingFormPage() {
         {/* Back Button */}
         <div className="mb-4">
           <Link
-            to={`/trekking/${trek.id}`}
+            to={`reusabledetails`}
             className="flex items-center gap-2 text-sky-600 hover:underline"
           >
             <ArrowLeft className="h-4 w-4" />
