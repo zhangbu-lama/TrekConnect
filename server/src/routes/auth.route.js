@@ -1,8 +1,6 @@
-import express from "express"
+import express from "express";
+import { signup } from "../controllers/index.js";
 
-export const authRouter = express.Router()
+export const authRouter = express.Router();
 
-
-
-
-
+authRouter.post("/signup", signup);
