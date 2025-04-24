@@ -22,7 +22,7 @@ app.get("/", (_, res) => {
 /* Routes */
 // Auth route
 import { authRouter } from "./routes/index.js";
-app.on("/api/v1/auth", authRouter);
+app.use("/api/v1/auth", authRouter);
 
 // error handling middleware
 app.use(errorReponseHandler);

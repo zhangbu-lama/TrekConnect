@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema(
     {
@@ -13,6 +14,11 @@ const userSchema = new mongoose.Schema(
         email_address: {
             type: String,
             required: true,
+            unique: true,
+        },
+        password: {
+            type: String,
+            required: true,
         },
         role: {
             type: String,
@@ -25,5 +31,19 @@ const userSchema = new mongoose.Schema(
     },
     { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } },
 );
+
+userSchema.pre("save", function(next) {
+    if (!this.isModified("password")) {
+        return next();
+    } else {
+        try {
+            const hash = bcrypt.hash(this.password, 10);
+            this.password = hash;
+            next();
+        } catch (error) {
+            next(error);
+        }
+    }
+});
 
 export const User = mongoose.model("User", userSchema);
