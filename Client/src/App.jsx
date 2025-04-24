@@ -7,7 +7,7 @@ import Dashboard from "./Components/AdminPanel/Dashboard.jsx";
 import AddPage from "./Components/AdminPanel/AddPlacePage.jsx";
 import AddDetails from "./Components/AdminPanel/AddDetails.jsx";
 import ShowBookings from "./Components/AdminPanel/Placebooking.jsx";
-import Reusable from "./Components/Secondpage/reusable.jsx";
+import Reusable from "./Components/Secondpage/Reusable.jsx";
 import Reusabledetails from "./Components/Detailspage/Reusabledetails.jsx";
 import BookingFormPage from "./Components/Detailspage/Bookingform.jsx";
 import LoginPage from "./Components/Auth/Login.jsx";
