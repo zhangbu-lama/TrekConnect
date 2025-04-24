@@ -3,7 +3,7 @@
 import { ArrowRight, MapPin, Clock, Mountain } from "lucide-react";
 import { Link } from "react-router-dom";
 import React from "react";
-
+import { motion } from "framer-motion";
 export default function TrekkingPage() {
   const trekkingSpots = [
     {
