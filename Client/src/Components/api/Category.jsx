@@ -25,3 +25,8 @@ export const deleteCategory = async (id) => {
   const response = await axiosInstance.delete(`/categories/delete/${id}/`);
   return response.data;
 };
+
+export const fetchPlacesByCategory = async (categoryId) => {
+  const response = await axiosInstance.get(`/places/all/?category=${categoryId}`);
+  return response.data;
+};

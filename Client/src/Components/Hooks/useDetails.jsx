@@ -1,60 +1,62 @@
-// src/store/useDetailsStore.js
-import create from 'zustand';
-import axiosInstance from '../api/axiosInstance';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  fetchDetails,
+  fetchDetailById,
+  fetchDetailsByPlace,
+  addDetail,
+  updateDetail,
+  deleteDetail,
+} from '../api/Detail';
 
-const useDetailsStore = create((set) => ({
-  details: [],
-  isLoading: false,
-  error: null,
+export const useDetails = () => {
+  return useQuery({
+    queryKey: ['details'],
+    queryFn: fetchDetails,
+  });
+};
 
-  // Fetch details
-  fetchDetails: async () => {
-    set({ isLoading: true });
-    try {
-      const response = await axiosInstance.get('/details/all/');
-      set({ details: response.data, isLoading: false });
-    } catch (error) {
-      set({ error: error.message, isLoading: false });
-    }
-  },
+export const useDetailById = (id) => {
+  return useQuery({
+    queryKey: ['details', id],
+    queryFn: () => fetchDetailById(id),
+    enabled: !!id,
+  });
+};
 
-  // Add detail
-  addDetail: async (newDetail) => {
-    try {
-      const response = await axiosInstance.post('/details/add/', newDetail);
-      set((state) => ({
-        details: [...state.details, response.data],
-      }));
-    } catch (error) {
-      set({ error: error.message });
-    }
-  },
+export const useDetailsByPlace = (placeId) => {
+  return useQuery({
+    queryKey: ['details', 'place', placeId],
+    queryFn: () => fetchDetailsByPlace(placeId),
+    enabled: !!placeId,
+  });
+};
 
-  // Update detail
-  updateDetail: async (id, updatedDetail) => {
-    try {
-      const response = await axiosInstance.put(`/details/update/${id}/`, updatedDetail);
-      set((state) => ({
-        details: state.details.map((detail) =>
-          detail.id === id ? { ...detail, ...response.data } : detail
-        ),
-      }));
-    } catch (error) {
-      set({ error: error.message });
-    }
-  },
+export const useAddDetail = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: addDetail,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['details'] });
+    },
+  });
+};
 
-  // Delete detail
-  deleteDetail: async (id) => {
-    try {
-      await axiosInstance.delete(`/details/delete/${id}/`);
-      set((state) => ({
-        details: state.details.filter((detail) => detail.id !== id),
-      }));
-    } catch (error) {
-      set({ error: error.message });
-    }
-  },
-}));
+export const useUpdateDetail = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }) => updateDetail(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['details'] });
+    },
+  });
+};
 
-export default useDetailsStore;
+export const useDeleteDetail = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteDetail,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['details'] });
+    },
+  });
+};

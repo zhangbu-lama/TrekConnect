@@ -38,7 +38,7 @@ const Activities = () => {
       title: category.name,
       description: category.description,
       image: category.image,
-      path: "/category/" + category.id,
+      path:`/places?category=${category.id}`,
     });
   });
 
@@ -54,20 +54,17 @@ const Activities = () => {
     setActiveIndex(newIndex);
   };
 
-  // Auto swipe effect
   useEffect(() => {
     const intervalId = setInterval(() => {
-      handleCarouselTransition(1); // Auto swipe next activity
-    }, 5000); // Change slide every 5 seconds
+      handleCarouselTransition(1); 
+    }, 5000); 
 
-    // Clear interval on component unmount
     return () => clearInterval(intervalId);
   }, [activeIndex]);
 
   return (
     <div className="bg-[url('./res/mountains.webp')] bg-cover bg-center">
       <div className="pb-12 bg-[linear-gradient(0deg,_rgba(255,255,255,1)_0%,_rgba(255,255,255,0.3)_50%,_rgba(255,255,255,1)_100%)]">
-        {/* Introduction */}
         <section className="mt-12 pt-12 px-6 max-w-screen-lg mx-auto space-y-4 text-xl text-justify">
           <p>
             <span className="font-bold text-red-600">Lorem</span> ipsum dolor sit amet consectetur adipisicing elit. Autem alias fugiat velit harum quia corporis nemo, animi tempora quae itaque dolore sunt,
