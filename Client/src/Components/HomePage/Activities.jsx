@@ -1,75 +1,94 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { fetchCategories } from "../api/Category"; 
 
+import boulderImage from "../../assets/boulder.png";
+import riccardoImage from "../../assets/pexels-riccardo-303040.webp";
 
-import trekImage from '../../assets/trek.webp';
-import boulderImage from '../../assets/boulder.png';
-import peakImage from '../../assets/peak.webp';
-import riccardoImage from '../../assets/pexels-riccardo-303040.webp';
+const BASE_URL = "http://localhost:8000"; 
+
 const Activities = () => {
+  const [categories, setCategories] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const navigate = useNavigate();
 
-  const activities = [
-    {
-      title: "Trekking",
-      image: trekImage,
-      description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores veritatis dicta quis neque praesentium aut autem ducimus temporibus. Adipisci, fuga obcaecati! Aspernatur, dolores eaque dolorem delectus quasi architecto repellendus ratione.",
-      path: "/Reusable",
-    },
-    {
-      title: "Bouldering",
-      image: boulderImage,
-      description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores veritatis dicta quis neque praesentium aut autem ducimus temporibus. Adipisci, fuga obcaecati! Aspernatur, dolores eaque dolorem delectus quasi architecto repellendus ratione.",
-      path: "/bouldering",
-    },
-    {
-      title: "Peak Climbing",
-      image: peakImage,
-      description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores veritatis dicta quis neque praesentium aut autem ducimus temporibus. Adipisci, fuga obcaecati! Aspernatur, dolores eaque dolorem delectus quasi architecto repellendus ratione.",
-      path: "/Reusable",
-    },
-  ];
+  useEffect(() => {
+    const getCategories = async () => {
+      try {
+        const data = await fetchCategories();
+
+        const formattedData = data.map((category) => ({
+          ...category,
+          image: category.image ? `${BASE_URL}${category.image}` : "https://source.unsplash.com/800x600/?nature",
+        }));
+
+        setCategories(formattedData);
+      } catch (err) {
+        console.error("Failed to fetch categories:", err);
+      }
+    };
+
+    getCategories();
+  }, []);
+
+  const dynamicActivities = [];
+
+  categories.forEach((category) => {
+    dynamicActivities.push({
+      title: category.name,
+      description: category.description,
+      image: category.image,
+      path: "/category/" + category.id,
+    });
+  });
+
+  dynamicActivities.push({
+    title: "Bouldering",
+    image: boulderImage,
+    description: "Experience the thrill of climbing without ropes on challenging boulders!",
+    path: "/bouldering",
+  });
 
   const handleCarouselTransition = (direction) => {
-    const newIndex = (activeIndex + direction + activities.length) % activities.length;
+    const newIndex = (activeIndex + direction + dynamicActivities.length) % dynamicActivities.length;
     setActiveIndex(newIndex);
   };
 
+  // Auto swipe effect
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      handleCarouselTransition(1); // Auto swipe next activity
+    }, 5000); // Change slide every 5 seconds
+
+    // Clear interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [activeIndex]);
+
   return (
     <div className="bg-[url('./res/mountains.webp')] bg-cover bg-center">
-      
       <div className="pb-12 bg-[linear-gradient(0deg,_rgba(255,255,255,1)_0%,_rgba(255,255,255,0.3)_50%,_rgba(255,255,255,1)_100%)]">
-        <section
-          data-visible="false"
-          id="introduction"
-          className="fade-in duration-[2s] ease-in-out mt-12 pt-12 px-6 max-w-screen-lg mx-auto w-full space-y-2 text-justify text-xl"
-        >
+        {/* Introduction */}
+        <section className="mt-12 pt-12 px-6 max-w-screen-lg mx-auto space-y-4 text-xl text-justify">
           <p>
-            <span className="text-xl font-bold text-red-600 text-brand">Lorem</span>
-            ipsum dolor sit amet consectetur adipisicing elit. Quibusdam, atque sequi debitis quisquam asperiores rem placeat, illum ipsum doloribus earum excepturi similique blanditiis quod consequatur molestiae iure possimus quam provident.
+            <span className="font-bold text-red-600">Lorem</span> ipsum dolor sit amet consectetur adipisicing elit. Autem alias fugiat velit harum quia corporis nemo, animi tempora quae itaque dolore sunt,
+             temporibus consequatur quod. Necessitatibus id reiciendis non molestias.
           </p>
-          <p>Hisi Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia, excepturi labore cum voluptatem sit odio sint soluta dolorum quaerat nobis. Corrupti ea reprehenderit voluptate impedit totam enim nobis volutpates repellendus?</p>
-          <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Suscipit repudiandae mollitia reprehenderit magnam dignissimos illum delectus beatae aliquid in accusamus? Vel omnis aspernatur ut similique quidem saepe natus obcaecati impedit?</p>
         </section>
 
-      
-
-        <section data-visible="false" id="activities" className="fade-in duration-[2s] ease-in-out mt-12 pt-12 px-6 max-w-screen-lg mx-auto">
+        {/* Activities Carousel */}
+        <section className="mt-12 pt-12 px-6 max-w-screen-lg mx-auto">
           <h2 className="text-5xl font-bold mb-4 uppercase font-oswald w-fit">
             <span className="text-brand">Choose</span> your activity
             <hr className="border-0 w-full h-1 bg-brand mt-2" />
           </h2>
 
-          {/* Carousel Section */}
           <div className="w-full h-[60vh] relative">
-            <div id="act_carousel" className="shadow-lg">
-              {activities.map((activity, index) => (
+            <div className="shadow-lg">
+              {dynamicActivities.map((activity, index) => (
                 <div
                   key={index}
-                  data-active={activeIndex === index ? "true" : "false"}
-                  className={`transition-opacity duration-300 absolute w-full h-full rounded bg-cover bg-center flex items-end ${
-                    activeIndex === index ? "opacity-100" : "opacity-0 hidden"
+                  className={`transition-opacity duration-500 absolute w-full h-full rounded bg-cover bg-center flex items-end ${
+                    activeIndex === index ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
                   }`}
                   style={{ backgroundImage: `url(${activity.image})` }}
                 >
@@ -93,7 +112,6 @@ const Activities = () => {
               ))}
             </div>
 
-            {/* Carousel Navigation */}
             <div className="text-4xl absolute top-1/2 left-0 right-0 flex justify-between px-4">
               <button
                 className="text-white bg-gray-800 hover:bg-gray-600 p-2 rounded-full"
