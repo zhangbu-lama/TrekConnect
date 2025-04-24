@@ -1,3 +1,4 @@
+
 import React from 'react'
 
 function bouldering() {
@@ -6,4 +7,4 @@ function bouldering() {
   )
 }
 
-export default bouldering 
+export default bouldering

@@ -26,6 +26,7 @@ function App() {
         <Route path="/bookingform" element={<BookingFormPage />} />
         <Route path="/admin/login" element={<LoginPage />} />
         <Route path="/admin/register" element={<RegisterPage />} />
+        
 
         <Route
           path="/admin"
