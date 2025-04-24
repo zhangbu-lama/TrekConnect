@@ -257,7 +257,7 @@ export default function TrekkingAdminPanel() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleDelete = async (id, index) => {
+  const handleDelete = async (id) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this trekking spot?"
     );

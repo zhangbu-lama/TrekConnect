@@ -194,7 +194,7 @@ export default function DetailsAdminPage() {
       "galleryImages",
       imagePreviews.gallery
         .filter((_, i) => i !== index)
-        .map((_, i) => ({ file: null }))
+        .map(() => ({ file: null }))
     );
   };
 
