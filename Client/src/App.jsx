@@ -7,7 +7,6 @@ import Dashboard from "./Components/AdminPanel/Dashboard.jsx";
 import AddPage from "./Components/AdminPanel/AddPlacePage.jsx";
 import AddDetails from "./Components/AdminPanel/AddDetails.jsx";
 import ShowBookings from "./Components/AdminPanel/Placebooking.jsx";
-import Bouldering from "./Components/Secondpage/bouldering.jsx";
 import Reusable from "./Components/Secondpage/reusable.jsx";
 import Reusabledetails from "./Components/Detailspage/Reusabledetails.jsx";
 import BookingFormPage from "./Components/Detailspage/Bookingform.jsx";
@@ -20,7 +19,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Routing />} />
-        <Route path="/bouldering" element={<Bouldering />} />
+        {/* <Route path="/bouldering" element={<Bouldering />} /> */}
         <Route path="/reusable" element={<Reusable />} />
         <Route path="/reusabledetails" element={<Reusabledetails />} />
         <Route path="/bookingform" element={<BookingFormPage />} />
