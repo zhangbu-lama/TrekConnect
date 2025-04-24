@@ -4,12 +4,10 @@ import {
   Calendar,
   Clock,
   Heart,
-  Layers,
   MapPin,
   Mountain,
   Star,
   Thermometer,
-  Users,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 
@@ -65,25 +63,12 @@ const trekkingSpots = [
       "First aid medical kit",
       "All government and local taxes",
     ],
-    notIncluded: [
-      "International airfare",
-      "Nepal visa fee",
-      "Travel insurance",
-      "Lunch and dinner in Kathmandu",
-      "Personal expenses (phone calls, laundry, bar bills, etc.)",
-      "Tips for guides and porters",
-    ],
     faqs: [
       { question: "How difficult is the Annapurna Circuit Trek?", answer: "The Annapurna Circuit is considered moderate to challenging. The main challenge is crossing the Thorong La Pass at 5,416m, which requires good physical fitness and proper acclimatization. Most days involve 5-7 hours of walking." },
       { question: "Do I need prior trekking experience?", answer: "While prior trekking experience is beneficial, it's not mandatory. However, good physical fitness is essential. We recommend preparing with cardiovascular exercises and hiking practice before the trek." },
       { question: "What is the best time to trek the Annapurna Circuit?", answer: "The best seasons are autumn (October-November) and spring (March-April) when the weather is clear with stable temperatures, offering excellent mountain views and comfortable trekking conditions." },
       { question: "What type of accommodation is available during the trek?", answer: "The trek follows established routes with teahouses/lodges in villages along the way. These provide basic but comfortable accommodation with twin beds, shared bathrooms, and dining areas." },
       { question: "Is altitude sickness a concern?", answer: "Yes, altitude sickness can affect anyone regardless of fitness level. Our itinerary includes proper acclimatization days. Our guides are trained to recognize symptoms and take appropriate action if needed." },
-    ],
-    testimonials: [
-      { name: "Sarah Johnson", country: "USA", comment: "The Annapurna Circuit was the adventure of a lifetime! The views were breathtaking, and our guide was incredibly knowledgeable and supportive.", rating: 5 },
-      { name: "Thomas Weber", country: "Germany", comment: "Crossing Thorong La Pass was challenging but so rewarding. The cultural experiences along the way made this trek special.", rating: 5 },
-      { name: "Akiko Tanaka", country: "Japan", comment: "Beautiful landscapes and wonderful people. The teahouses were better than I expected, and the food was delicious.", rating: 4 },
     ],
   },
 ];
@@ -97,13 +82,6 @@ const getTrekkingData = (id) => {
 const Check = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="20 6 9 17 4 12" />
-  </svg>
-);
-
-const X = (props) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M18 6 6 18" />
-    <path d="m6 6 12 12" />
   </svg>
 );
 
@@ -171,7 +149,6 @@ export default function DetailsPage() {
                 <span>{trek.bestSeason}</span>
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -183,8 +160,8 @@ export default function DetailsPage() {
           <div className="lg:col-span-2">
             {/* Tabs */}
             <div className="mb-12">
-              <div className="grid w-full grid-cols-4 border-b">
-                {["overview", "itinerary", "gallery", "reviews"].map((tab) => (
+              <div className="grid w-full grid-cols-3 border-b">
+                {["overview", "itinerary", "gallery"].map((tab) => (
                   <button
                     key={tab}
                     className={`py-2 px-4 text-center ${activeTab === tab ? "border-b-2 border-emerald-500 text-emerald-600" : "text-gray-500"}`}
@@ -266,7 +243,7 @@ export default function DetailsPage() {
                       ))}
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
                       <div>
                         <h3 className="text-xl font-bold text-sky-800 mb-3 flex items-center gap-2">
                           <div className="bg-emerald-100 p-1 rounded-full">
@@ -279,25 +256,6 @@ export default function DetailsPage() {
                             <li key={index} className="flex items-start gap-2 text-gray-700">
                               <div className="bg-emerald-100 p-1 rounded-full mt-1 flex-shrink-0">
                                 <Check className="h-3 w-3 text-emerald-600" />
-                              </div>
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div>
-                        <h3 className="text-xl font-bold text-sky-800 mb-3 flex items-center gap-2">
-                          <div className="bg-red-100 p-1 rounded-full">
-                            <X className="h-4 w-4 text-red-600" />
-                          </div>
-                          What's Not Included
-                        </h3>
-                        <ul className="space-y-2">
-                          {trek.notIncluded.map((item, index) => (
-                            <li key={index} className="flex items-start gap-2 text-gray-700">
-                              <div className="bg-red-100 p-1 rounded-full mt-1 flex-shrink-0">
-                                <X className="h-3 w-3 text-red-600" />
                               </div>
                               {item}
                             </li>
@@ -331,28 +289,28 @@ export default function DetailsPage() {
 
               {/* Itinerary Tab */}
               {activeTab === "itinerary" && (
-                <div className="mt-6">
-                  <div className="bg-white rounded-xl p-6 shadow-md">
-                    <h2 className="text-2xl font-bold text-sky-800 mb-6">Day-by-Day Itinerary</h2>
-                    <div className="space-y-6">
-                      {trek.itinerary.map((day, index) => (
-                        <div key={index} className="relative pl-8 pb-6">
-                          {index < trek.itinerary.length - 1 && (
-                            <div className="absolute left-[15px] top-[28px] h-full w-0.5 bg-sky-200"></div>
-                          )}
-                          <div className="absolute left-0 top-0 flex items-center justify-center w-8 h-8 rounded-full bg-sky-500 text-white font-bold text-sm">
-                            {day.day}
-                          </div>
-                          <div className="bg-sky-50 rounded-lg p-4">
-                            <h3 className="font-bold text-sky-800 text-lg">{day.title}</h3>
-                            <p className="text-gray-700 mt-2">{day.description}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
+  <div className="mt-6">
+    <div className="bg-white rounded-xl p-6 shadow-md">
+      <h2 className="text-2xl font-bold text-sky-800 mb-6">Day-by-Day Itinerary</h2>
+      <div className="space-y-6">
+        {trek.itinerary.map((day, index) => (
+          <div key={index} className="relative pl-8 pb-6">
+            {index < trek.itinerary.length - 1 && (
+              <div className="absolute left-[15px] top-[28px] h-full w-0.5 bg-sky-200"></div>
+            )}
+            <div className="absolute left-0 top-0 flex items-center justify-center w-8 h-8 rounded-full bg-sky-500 text-white font-bold text-sm">
+              {day.day}
+            </div>
+            <div className="bg-sky-50 rounded-lg p-4">
+              <h3 className="font-bold text-sky-800 text-lg">{day.title}</h3>
+              <p className="text-gray-700 mt-2">{day.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
 
               {/* Gallery Tab */}
               {activeTab === "gallery" && (
@@ -373,90 +331,12 @@ export default function DetailsPage() {
                   </div>
                 </div>
               )}
-
-              {/* Reviews Tab */}
-              {activeTab === "reviews" && (
-                <div className="mt-6">
-                  <div className="bg-white rounded-xl p-6 shadow-md">
-                    <h2 className="text-2xl font-bold text-sky-800 mb-6">Traveler Reviews</h2>
-                    <div className="space-y-6">
-                      {trek.testimonials.map((testimonial, index) => (
-                        <div key={index} className="border-b border-gray-100 pb-6 last:border-0">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <h3 className="font-bold text-sky-800">{testimonial.name}</h3>
-                              <p className="text-gray-500 text-sm">{testimonial.country}</p>
-                            </div>
-                            <div className="flex">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`h-4 w-4 ${i < testimonial.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                          <p className="text-gray-700">{testimonial.comment}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
           {/* Right Column - Booking Card */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl p-6 shadow-md sticky top-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-2xl font-bold text-sky-800">Price</h3>
-                <div className="text-2xl font-bold text-emerald-600">${trek.price}</div>
-              </div>
-              <p className="text-gray-500 mb-6">per person</p>
-
-              <div className="space-y-4 mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="bg-sky-100 p-2 rounded-full">
-                    <Calendar className="h-5 w-5 text-sky-600" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-500">Duration</div>
-                    <div className="font-medium">{trek.duration}</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="bg-sky-100 p-2 rounded-full">
-                    <Thermometer className="h-5 w-5 text-sky-600" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-500">Best Season</div>
-                    <div className="font-medium">{trek.bestSeason}</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="bg-sky-100 p-2 rounded-full">
-                    <Layers className="h-5 w-5 text-sky-600" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-500">Difficulty</div>
-                    <div className="font-medium">{trek.difficulty}</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="bg-sky-100 p-2 rounded-full">
-                    <Users className="h-5 w-5 text-sky-600" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-500">Group Size</div>
-                    <div className="font-medium">2-12 People</div>
-                  </div>
-                </div>
-              </div>
-
               <Link
                 to={`/bookingform`}
                 className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-lg shadow-md inline-block text-center"
