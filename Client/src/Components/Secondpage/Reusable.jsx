@@ -1,8 +1,7 @@
-"use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { usePlaces } from "../Hooks/usePlace";
 import usePlaceStore from "../Store/placeStore";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, MapPin, Clock, Mountain } from "lucide-react";
 
@@ -10,14 +9,25 @@ const IMAGE_BASE_URL = "http://localhost:8000";
 
 const TrekkingPage = () => {
   const { data: places = [], isLoading, isError } = usePlaces();
-  const { filter, selectedCategory } = usePlaceStore();
-  
+  const { filter, selectedCategory, setSelectedCategory } = usePlaceStore();
+  const [searchParams] = useSearchParams(); // Get query parameters
+
+  // Set selectedCategory from URL query parameter on mount
+  useEffect(() => {
+    const categoryId = searchParams.get("category");
+    if (categoryId) {
+      setSelectedCategory(Number(categoryId)); // Convert to number and set in store
+    } else {
+      setSelectedCategory(null); // Reset if no category is specified
+    }
+  }, [searchParams, setSelectedCategory]);
+
   const filteredPlaces = places.filter((place) => {
     const matchesFilter = place.name.toLowerCase().includes(filter.toLowerCase());
     const matchesCategory = selectedCategory ? place.category === selectedCategory : true;
     return matchesFilter && matchesCategory;
   });
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-sky-100 flex flex-col">
       {/* Header */}
@@ -37,7 +47,7 @@ const TrekkingPage = () => {
           <h1 className="text-5xl font-bold text-white mb-4 drop-shadow-lg">Nepal Trekking Adventures</h1>
           <p className="text-xl text-emerald-200 max-w-2xl mx-auto">Explore the Best of Nepal's Trekking Trails</p>
           <div className="mt-8">
-            <Link to="/contact" className="inline-flex items-center bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg transition">
+            <Link to="/bookingform" className="inline-flex items-center bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg transition">
               Start Your Journey <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </div>
@@ -48,17 +58,17 @@ const TrekkingPage = () => {
           </svg>
         </div>
       </header>
-      
+
       {/* Main */}
       <main className="flex-grow max-w-7xl mx-auto px-4 py-12">
         <section className="text-center mb-12">
           <h2 className="text-3xl font-bold text-sky-800 mb-4">Discover Breathtaking Trails</h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">Nepal offers some of the world's most spectacular trekking routes.</p>
         </section>
-        
+
         {isLoading && <div className="text-center py-10">Loading trekking places...</div>}
         {isError && <div className="text-center py-10 text-red-500">Failed to load trekking places.</div>}
-        
+
         {!isLoading && !isError && (
           <>
             {filteredPlaces.length === 0 ? (
@@ -83,17 +93,17 @@ const TrekkingPage = () => {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-40"></div>
                       </div>
                     )}
-                    
+
                     <div className="p-5 flex-grow flex flex-col">
                       <h2 className="text-2xl font-bold text-sky-700 mb-1">{place.name}</h2>
-                      
+
                       <div className="flex items-center mb-3 text-gray-500">
                         <MapPin className="h-4 w-4 mr-1 text-emerald-500 flex-shrink-0" />
                         <p className="text-sm italic">{place.location}</p>
                       </div>
-                      
+
                       <p className="text-gray-700 mb-4 flex-grow">{place.description}</p>
-                      
+
                       <div className="mt-2 pt-3 border-t border-gray-100">
                         <div className="flex items-center text-emerald-600">
                           <Clock className="h-4 w-4 mr-2" />
@@ -101,10 +111,10 @@ const TrekkingPage = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="px-5 pb-5">
-                      <Link 
-                        to={`/reusabledetails`}
+                      <Link
+                        to={`/reusabledetails/${place.id}`}
                         className="block w-full text-center bg-sky-500 hover:bg-sky-600 text-white py-2 px-4 rounded-lg font-medium transition-colors"
                       >
                         Explore Trail
@@ -117,7 +127,7 @@ const TrekkingPage = () => {
           </>
         )}
       </main>
-      
+
       {/* Why Trek Section */}
       <section className="bg-gradient-to-r from-sky-100 to-emerald-50 rounded-xl shadow-lg p-8 mb-16 max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold text-sky-800 mb-6">Why Trek in Nepal?</h2>
@@ -147,7 +157,7 @@ const TrekkingPage = () => {
           ))}
         </div>
       </section>
-      
+
       {/* Footer */}
       <footer className="bg-gradient-to-r from-sky-800 to-sky-700 text-white py-12 px-4 relative">
         <div className="absolute top-0 left-0 w-full overflow-hidden">
@@ -213,7 +223,7 @@ const TrekkingPage = () => {
         </div>
         <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-sky-600 text-center text-sky-200">
           <p>
-            &copy; {new Date().getFullYear()} Nepal Trekking Adventures. All rights reserved.
+            © {new Date().getFullYear()} Nepal Trekking Adventures. All rights reserved.
           </p>
         </div>
       </footer>
@@ -221,4 +231,4 @@ const TrekkingPage = () => {
   );
 };
 
-export default TrekkingPage;  
+export default TrekkingPage;
