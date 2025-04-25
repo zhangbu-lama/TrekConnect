@@ -14,8 +14,11 @@ const Sidebar = () => {
         <NavLink to="/dashboard" className={linkStyle}>
           📊 Dashboard
         </NavLink>
-        <NavLink to="/add-page" className={linkStyle}>
-          ➕ Add Page
+        <NavLink to="/add-category" className={linkStyle}>
+          📚 Add Category
+        </NavLink>
+        <NavLink to="/page" className={linkStyle}>
+          ➕ Add Place
         </NavLink>
         <NavLink to="/add-details" className={linkStyle}>
           📝 Add Details

@@ -18,7 +18,7 @@ export const useAddCategory = () => {
     mutationFn: addCategory,
     onSuccess: (newCategory) => {
       // Optimistically update the local cache
-      queryClient.setQueryData(['categories'], (oldCategories) =>
+      queryClient.setQueryData(['catego ries'], (oldCategories) =>
         oldCategories ? [...oldCategories, newCategory] : [newCategory]
       );
       // Invalidate to refetch from server, ensuring sync
