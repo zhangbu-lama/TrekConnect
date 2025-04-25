@@ -24,5 +24,17 @@ app.get("/", (_, res) => {
 import { authRouter } from "./routes/index.js";
 app.use("/api/v1/auth", authRouter);
 
+import { treksRouter } from "./routes/index.js";
+// Treks route
+app.use("/api/treks", treksRouter);
+
+import { placesRouter } from "./routes/index.js";
+// places router
+app.use("/api/places", placesRouter);
+
+import { categoriesRouter } from "./routes/index.js";
+// categories router
+app.use("/api/categories", categoriesRouter);
+
 // error handling middleware
 app.use(errorReponseHandler);
