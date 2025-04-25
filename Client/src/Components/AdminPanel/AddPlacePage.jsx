@@ -1,174 +1,401 @@
-import { useState } from 'react';
-import { usePlaces, useAddPlace, useUpdatePlace, useDeletePlace } from '../Hooks/usePlace';
-import { motion } from 'framer-motion';
-import { Pencil, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useForm, Controller } from 'react-hook-form';
+import { fetchPlaces, addPlace, updatePlace, deletePlace } from '../api/Place';
+import { useCategories } from '../hooks/useCategory'; // Import the useCategories hook
+import usePlaceStore from '../Store/placeStore';
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+  CircularProgress,
+  Alert,
+  Box,
+  Grid,
+} from '@mui/material';
 import Layout from './Layout';
-import React from 'react';
 
-const initialState = {
-  name: '',
-  location: '',
-  description: '',
-  category: '',
-  timetotravel: '',
-  image: null,
-};
+const AdminPlaces = () => {
+  const queryClient = useQueryClient();
+  const { filter, setFilter, selectedCategory, setSelectedCategory } = usePlaceStore();
 
-const PlacesPage = () => {
-  const { data: places, isLoading } = usePlaces();
-  const addPlace = useAddPlace();
-  const updatePlace = useUpdatePlace();
-  const deletePlace = useDeletePlace();
-  const [formData, setFormData] = useState(initialState);
-  const [editingId, setEditingId] = useState(null);
+  // Fetch places and categories
+  const { data: places, isLoading: placesLoading, error: placesError } = useQuery({
+    queryKey: ['places'],
+    queryFn: fetchPlaces,
+  });
+  const { data: categories, isLoading: categoriesLoading, error: categoriesError } = useCategories(); // Use the hook
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: files ? files[0] : value,
-    }));
-  };
+  // Form setup with validation
+  const { register, handleSubmit, reset, setValue, control, formState: { errors } } = useForm({
+    defaultValues: {
+      name: '',
+      location: '',
+      description: '',
+      category: '',
+      timetotravel: '',
+      image: null,
+    },
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const data = new FormData();
-    for (let key in formData) {
-      data.append(key, formData[key]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [editingPlace, setEditingPlace] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+
+  // Mutations
+  const addMutation = useMutation({
+    mutationFn: addPlace,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['places'] });
+      reset();
+      setOpenDialog(false);
+      setImagePreview(null);
+    },
+    onError: (error) => {
+      console.error('Add error:', error);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => updatePlace(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['places'] });
+      reset();
+      setOpenDialog(false);
+      setEditingPlace(null);
+      setImagePreview(null);
+    },
+    onError: (error) => {
+      console.error('Update error:', error);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deletePlace,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['places'] });
+    },
+    onError: (error) => {
+      console.error('Delete error:', error);
+    },
+  });
+
+  // Handle form submission
+  const onSubmit = (data) => {
+    const formData = new FormData();
+    formData.append('name', data.name);
+    formData.append('location', data.location);
+    formData.append('description', data.description);
+    formData.append('category', data.category);
+    formData.append('timetotravel', data.timetotravel);
+    if (data.image && data.image[0]) {
+      formData.append('image', data.image[0]);
     }
 
-    if (editingId) {
-      updatePlace.mutate({ id: editingId, data }, {
-        onSuccess: () => {
-          setFormData(initialState);
-          setEditingId(null);
-        },
-      });
+    if (editingPlace) {
+      updateMutation.mutate({ id: editingPlace.id, data: formData });
     } else {
-      addPlace.mutate(data, {
-        onSuccess: () => setFormData(initialState),
-      });
+      addMutation.mutate(formData);
     }
   };
 
-  const handleEdit = (place) => {
-    setFormData(place);
-    setEditingId(place.id);
+  // Open dialog for adding/editing
+  const handleOpenDialog = (place = null) => {
+    if (place) {
+      setEditingPlace(place);
+      setValue('name', place.name);
+      setValue('location', place.location);
+      setValue('description', place.description);
+      setValue('category', place.category.id);
+      setValue('timetotravel', place.timetotravel);
+      setImagePreview(place.image || null);
+    } else {
+      setEditingPlace(null);
+      reset();
+      setImagePreview(null);
+    }
+    setOpenDialog(true);
   };
 
+  // Handle delete
   const handleDelete = (id) => {
-    deletePlace.mutate(id);
+    if (window.confirm('Are you sure you want to delete this place?')) {
+      deleteMutation.mutate(id);
+    }
   };
+
+  // Handle image preview
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImagePreview(URL.createObjectURL(file));
+    } else {
+      setImagePreview(null);
+    }
+  };
+
+  // Filter places
+  const filteredPlaces = places?.filter((place) => {
+    const matchesFilter = place.name.toLowerCase().includes(filter.toLowerCase());
+    const matchesCategory = selectedCategory ? place.category.id === selectedCategory : true;
+    return matchesFilter && matchesCategory;
+  });
+
+  // Loading and error states
+  if (placesLoading || categoriesLoading) {
+    return (
+      <Box display="flex" justifyContent="center" my={4}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (placesError) {
+    return <Alert severity="error">Error loading places: {placesError.message}</Alert>;
+  }
+
+  if (categoriesError) {
+    return <Alert severity="error">Error loading categories: {categoriesError.message}</Alert>;
+  }
 
   return (
-    <>
-      <Layout>
-        <div className="max-w-6xl mx-auto p-6">
-          <h1 className="text-3xl font-bold text-center text-blue-600 mb-8">🏞️ Explore & Manage Places</h1>
+    <Layout>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Typography variant="h4" gutterBottom>
+          Manage Places
+        </Typography>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl shadow space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Place Name"
-                className="input"
-                required
-              />
-              <input
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                placeholder="Location"
-                className="input"
-                required
-              />
-              <input
-                name="timetotravel"
-                value={formData.timetotravel}
-                onChange={handleChange}
-                placeholder="Time to Travel"
-                className="input"
-                required
-              />
-              <input
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                placeholder="Category ID"
-                className="input"
-                required
-              />
-              <input
-                type="file"
-                name="image"
-                onChange={handleChange}
-                className="input"
-              />
-            </div>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Description"
-              className="input w-full"
-              required
+        {/* Error Messages */}
+        {addMutation.isError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            Error adding place: {addMutation.error.message}
+          </Alert>
+        )}
+        {updateMutation.isError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            Error updating place: {updateMutation.error.message}
+          </Alert>
+        )}
+        {deleteMutation.isError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            Error deleting place: {deleteMutation.error.message}
+          </Alert>
+        )}
+
+        {/* Filters */}
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Search by Name"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              fullWidth
+              variant="outlined"
             />
-            <button
-              type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg"
-            >
-              {editingId ? 'Update Place' : 'Add Place'}
-            </button>
-          </form>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth variant="outlined">
+              <InputLabel>Category</InputLabel>
+              <Select
+                value={selectedCategory || ''}
+                onChange={(e) => setSelectedCategory(e.target.value || null)}
+                label="Category"
+              >
+                <MenuItem value="">All Categories</MenuItem>
+                {categories?.map((cat) => (
+                  <MenuItem key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
 
-          {/* List */}
-          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-            {isLoading ? (
-              <p className="col-span-full text-center">Loading...</p>
-            ) : (
-              places?.map((place) => (
-                <motion.div
-                  key={place.id}
-                  className="bg-white rounded-xl p-4 shadow hover:shadow-lg transition-all"
-                  whileHover={{ scale: 1.02 }}
-                >
-                  {place.image && (
-                    <img
-                      src={place.image}
-                      alt={place.name}
-                      className="w-full h-48 object-cover rounded-lg mb-3"
-                    />
-                  )}
-                  <h3 className="text-xl font-semibold text-blue-700">{place.name}</h3>
-                  <p className="text-sm text-gray-600">{place.location}</p>
-                  <p className="mt-2 text-sm">{place.description}</p>
-                  <p className="mt-2 text-green-600 font-medium">{place.timetotravel}</p>
+        {/* Add Place Button */}
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => handleOpenDialog()}
+          sx={{ mb: 3 }}
+        >
+          Add Place
+        </Button>
 
-                  <div className="flex justify-between mt-4">
-                    <button
-                      onClick={() => handleEdit(place)}
-                      className="bg-yellow-400 text-white px-3 py-1 rounded flex items-center gap-1"
+        {/* Places Table */}
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Location</TableCell>
+                <TableCell>Category</TableCell>
+                <TableCell>Time to Travel</TableCell>
+                <TableCell align="right">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredPlaces?.map((place) => (
+                <TableRow key={place.id}>
+                  <TableCell>{place.name}</TableCell>
+                  <TableCell>{place.location}</TableCell>
+                  <TableCell>{place.category.name}</TableCell>
+                  <TableCell>{place.timetotravel}</TableCell>
+                  <TableCell align="right">
+                    <Button
+                      onClick={() => handleOpenDialog(place)}
+                      sx={{ mr: 1 }}
+                      disabled={addMutation.isLoading || updateMutation.isLoading}
                     >
-                      <Pencil size={16} /> Edit
-                    </button>
-                    <button
+                      Edit
+                    </Button>
+                    <Button
+                      color="error"
                       onClick={() => handleDelete(place.id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded flex items-center gap-1"
+                      disabled={deleteMutation.isLoading}
                     >
-                      <Trash2 size={16} /> Delete
-                    </button>
-                  </div>
-                </motion.div>
-              ))
-            )}
-          </div>
-        </div>
-      </Layout>
-    </>
+                      {deleteMutation.isLoading && deleteMutation.variables === place.id
+                        ? <CircularProgress size={20} />
+                        : 'Delete'}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        {/* Add/Edit Dialog */}
+        <Dialog
+          open={openDialog}
+          onClose={() => setOpenDialog(false)}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle>{editingPlace ? 'Edit Place' : 'Add Place'}</DialogTitle>
+          <DialogContent>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <TextField
+                label="Name"
+                {...register('name', {
+                  required: 'Name is required',
+                  maxLength: { value: 100, message: 'Name must be 100 characters or less' },
+                })}
+                fullWidth
+                margin="normal"
+                error={!!errors.name}
+                helperText={errors.name?.message}
+              />
+              <TextField
+                label="Location"
+                {...register('location', {
+                  required: 'Location is required',
+                  maxLength: { value: 100, message: 'Location must be 100 characters or less' },
+                })}
+                fullWidth
+                margin="normal"
+                error={!!errors.location}
+                helperText={errors.location?.message}
+              />
+              <TextField
+                label="Description"
+                {...register('description')}
+                fullWidth
+                margin="normal"
+                multiline
+                rows={4}
+              />
+              <FormControl fullWidth margin="normal" error={!!errors.category}>
+                <InputLabel>Category</InputLabel>
+                <Controller
+                  name="category"
+                  control={control}
+                  rules={{ required: 'Category is required' }}
+                  render={({ field }) => (
+                    <Select {...field} label="Category">
+                      {categories?.map((cat) => (
+                        <MenuItem key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                />
+                {errors.category && (
+                  <Typography color="error" variant="caption">
+                    {errors.category.message}
+                  </Typography>
+                )}
+              </FormControl>
+              <TextField
+                label="Time to Travel"
+                {...register('timetotravel', {
+                  required: 'Time to travel is required',
+                  maxLength: { value: 50, message: 'Time to travel must be 50 characters or less' },
+                })}
+                fullWidth
+                margin="normal"
+                error={!!errors.timetotravel}
+                helperText={errors.timetotravel?.message}
+              />
+              <Box sx={{ mt: 2 }}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  {...register('image')}
+                  onChange={handleImageChange}
+                />
+                {imagePreview && (
+                  <Box mt={2}>
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      style={{ maxWidth: '100%', maxHeight: '150px', borderRadius: '4px' }}
+                    />
+                  </Box>
+                )}
+              </Box>
+            </form>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenDialog(false)} disabled={addMutation.isLoading || updateMutation.isLoading}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              onClick={handleSubmit(onSubmit)}
+              color="primary"
+              disabled={addMutation.isLoading || updateMutation.isLoading}
+            >
+              {addMutation.isLoading || updateMutation.isLoading ? (
+                < circularProgress size={20} />
+              ) : editingPlace ? (
+                'Update'
+              ) : (
+                'Add'
+              )}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Container>
+    </Layout>
   );
 };
 
-export default PlacesPage;
+export default AdminPlaces;
