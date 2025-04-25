@@ -14,7 +14,8 @@ import LoginPage from "./Components/Auth/Login.jsx";
 import RegisterPage from "./Components/Auth/Register.jsx";
 import ProtectedRoute from "./Components/Auth/ProtectedRoute.jsx";
 import AddCategory from "./Components/AdminPanel/Category.jsx";
-
+import Bouldering from "./Components/Bouldering/Bouldering.jsx";
+import Location from "./Components/AdminPanel/Location.jsx";
 function App() {
   return (
     <Router>
@@ -26,6 +27,10 @@ function App() {
         <Route path="/bookingform" element={<BookingFormPage />} />
         <Route path="/admin/login" element={<LoginPage />} />
         <Route path="/admin/register" element={<RegisterPage />} />
+        <Route path="/bouldering" element={<Bouldering />} />
+        <Route path="/addlocation" element={<Location />} />
+
+        {/* Protected Routes */}
         
         <Route
           path="/admin"

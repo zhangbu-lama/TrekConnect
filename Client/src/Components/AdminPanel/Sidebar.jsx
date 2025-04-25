@@ -26,6 +26,9 @@ const Sidebar = () => {
         <NavLink to="/show-bookings" className={linkStyle}>
           📚 Show Bookings
         </NavLink>
+        <NavLink to="/addlocation" className={linkStyle}>
+          📚 Add location
+        </NavLink>
       </nav>
     </aside>
   );
