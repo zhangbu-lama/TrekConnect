@@ -665,3 +665,79 @@ export default function BookingFormPage() {
 //     </div>
 //   );
 // }
+
+
+
+// import React from 'react';
+// import { useDetails, useDetailsByPlace } from '../Hooks/useDetails';
+// import useDetailStore from '../Store/DetailStore';
+
+// const BASE_URL = 'http://127.0.0.1:8000';
+
+// const DetailsPage = () => {
+//   const { searchKeyword, setSearchKeyword, selectedPlace, setSelectedPlace } = useDetailStore();
+//   const { data: details, isLoading, error } = selectedPlace 
+//     ? useDetailsByPlace(selectedPlace) 
+//     : useDetails();
+
+//   if (isLoading) return <div className="text-center py-10">Loading...</div>;
+//   if (error) return <div className="text-center py-10 text-red-500">Error: {error.message}</div>;
+
+//   return (
+//     <div className="container mx-auto p-6">
+//       <h1 className="text-3xl font-bold mb-6">Trekking Adventures</h1>
+
+
+
+//       {/* Trek List */}
+//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//         {details
+//           ?.filter(detail => detail.name.toLowerCase().includes(searchKeyword.toLowerCase()))
+//           .map(detail => (
+//             <div key={detail.id} className="border rounded shadow p-4">
+//               <h2 className="text-xl font-semibold mb-2">{detail.name}</h2>
+//               <p><strong>Difficulty:</strong> {detail.difficulty}</p>
+//               <p><strong>Duration:</strong> {detail.duration}</p>
+//               <p><strong>Overview:</strong> {detail.overview}</p>
+//               <p><strong>Max Elevation:</strong> {detail.max_elevation}</p>
+//               <p><strong>Best Season:</strong> {detail.best_season}</p>
+//               <p><strong>Rating:</strong> {detail.rating} ({detail.reviews} reviews)</p>
+//               <p><strong>Contact:</strong> {detail.contact_number} | {detail.contact_email}</p>
+//               <div className="flex gap-2 mt-4">
+//                 {detail.image1 && (
+//                   <img
+//                     src={`${BASE_URL}${detail.image1}`}
+//                     alt={`${detail.name} image 1`}
+//                     className="w-20 h-20 object-cover rounded"
+//                   />
+//                 )}
+//                 {detail.image2 && (
+//                   <img
+//                     src={`${BASE_URL}${detail.image2}`}
+//                     alt={`${detail.name} image 2`}
+//                     className="w-20 h-20 object-cover rounded"
+//                   />
+//                 )}
+//                 {detail.image3 && (
+//                   <img
+//                     src={`${BASE_URL}${detail.image3}`}
+//                     alt={`${detail.name} image 3`}
+//                     className="w-20 h-20 object-cover rounded"
+//                   />
+//                 )}
+//                 {detail.image4 && (
+//                   <img
+//                     src={`${BASE_URL}${detail.image4}`}
+//                     alt={`${detail.name} image 4`}
+//                     className="w-20 h-20 object-cover rounded"
+//                   />
+//                 )}
+//               </div>
+//             </div>
+//           ))}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default DetailsPage;
