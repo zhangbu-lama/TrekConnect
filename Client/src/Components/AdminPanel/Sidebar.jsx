@@ -29,6 +29,9 @@ const Sidebar = () => {
         <NavLink to="/addlocation" className={linkStyle}>
           📚 Add location
         </NavLink>
+        <NavLink to="/addproduct" className={linkStyle}>
+          📚 Add Product
+        </NavLink>
       </nav>
     </aside>
   );
