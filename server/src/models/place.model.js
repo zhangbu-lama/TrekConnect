@@ -18,6 +18,7 @@ const placeModel = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Categorie",
         },
+        related_name: String,
         image: {
             type: String,
             required: true,
