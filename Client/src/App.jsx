@@ -116,7 +116,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 // Public Pages
 import Routing from "./Components/HomePage/Routing.jsx";
-import Reusable from "./Components/Secondpage/reusable.jsx";
+import Reusable from "./Components/Secondpage/Reusable.jsx";
 import Reusabledetails from "./Components/Detailspage/Reusabledetails.jsx";
 import BookingFormPage from "./Components/Detailspage/Bookingform.jsx";
 import Bouldering from "./Components/Bouldering/Bouldering.jsx";

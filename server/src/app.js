@@ -1,3 +1,5 @@
+import { config } from "dotenv";
+config()
 import cookieParser from "cookie-parser";
 import express from "express";
 import cors from "cors";
@@ -18,6 +20,8 @@ app.use(cookieParser());
 app.get("/", (_, res) => {
     res.status(200).json(new SuccessResponse(200, "tour travels server", null));
 });
+
+app.use("/uploads",express.static("uploads"));
 
 /* Routes */
 // Auth route
