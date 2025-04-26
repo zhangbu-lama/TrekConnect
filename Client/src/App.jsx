@@ -121,7 +121,7 @@ import Reusabledetails from "./Components/Detailspage/Reusabledetails.jsx";
 import BookingFormPage from "./Components/Detailspage/Bookingform.jsx";
 import Bouldering from "./Components/Bouldering/Bouldering.jsx";
 import AdminPanel from "./Components/AdminPanel/Addproduct.jsx";
-
+import ShowBooking from "./Components/AdminPanel/ShowBooking.jsx";
 // Admin Authentication
 import LoginPage from "./Components/Auth/Login.jsx";
 import RegisterPage from "./Components/Auth/Register.jsx";
@@ -134,7 +134,8 @@ import AddDetails from "./Components/AdminPanel/AddDetails.jsx";
 import ShowBookings from "./Components/AdminPanel/Placebooking.jsx";
 import AddCategory from "./Components/AdminPanel/Category.jsx";
 import Location from "./Components/AdminPanel/Location.jsx";
-
+import ProductBooking from "./Components/Bouldering/ProductBooking.jsx"
+import Down from "./Components/HomePage/Down.jsx";
 function App() {
   return (
     <Router>
@@ -150,6 +151,13 @@ function App() {
         {/* ✅ Auth Routes */}
         <Route path="/admin/login" element={<LoginPage />} />
         <Route path="/admin/register" element={<RegisterPage />} />
+
+        <Route path="/bookproduct" element={<ProductBooking />} />
+        <Route path="/bookproduct/:id" element={<ProductBooking />} />
+
+        <Route path="/down" element={<Down />} />
+
+        
 
         {/* ✅ Protected Admin Routes */}
         <Route
@@ -170,8 +178,14 @@ function App() {
               <AdminPanel />
           }
         />
+               <Route
+          path="/productbooking"
+          element={
+              <ShowBooking />
+          }
+        />
         <Route
-          path="/add-page"
+          path="/page"
           element={
               <AddPage />
           }

@@ -1,30 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Trash2, Loader2 } from 'lucide-react';
+import useProductStore from '../Store/useProductstore';
 import Layout from './Layout';
-
-// Static bookings data (replace with dynamic data fetching if needed)
-const bookings = [
-  {
-    id: 1,
-    customer: 'John Doe',
-    destination: 'Bali',
-    email: 'john@example.com',
-    date: '2025-05-01',
-    seats: 2,
-    status: 'Confirmed',
-  },
-  {
-    id: 2,
-    customer: 'Sita Sharma',
-    destination: 'Dubai',
-    email: 'sita@example.com',
-    date: '2025-06-15',
-    seats: 1,
-    status: 'Pending',
-  },
-];
 
 // Animation Variants (Copied from TrekAdminPanel)
 const containerVariants = {
@@ -40,11 +19,18 @@ const childVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
 };
 
-const Placebooking = () => {
+const AdminPanel = () => {
+  const { bookings, deleteBooking } = useProductStore();
+
   // Placeholder for dynamic data fetching (e.g., with React Query)
   const isLoading = false; // Set to true if fetching data
   const error = null; // Set to error object if fetch fails
-  const data = bookings; // Replace with fetched data
+
+  const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to cancel this booking?')) {
+      deleteBooking(id);
+    }
+  };
 
   return (
     <Layout>
@@ -66,9 +52,19 @@ const Placebooking = () => {
                 <span className="text-lg font-medium">Back to Dashboard</span>
               </Link>
               <h1 className="text-4xl font-extrabold text-white tracking-tight">
-                Booking Records Dashboard
+                Booking Management Dashboard
               </h1>
             </div>
+            {/* Optional: Add button for creating new bookings */}
+            {/*
+            <button
+              onClick={() => {/* Open add booking modal * /}}
+              className="bg-white text-emerald-600 font-semibold py-3 px-6 rounded-full flex items-center gap-2 hover:bg-emerald-50 hover:text-emerald-700 transition-all duration-200 shadow-md"
+            >
+              <Plus className="h-5 w-5" />
+              Add New Booking
+            </button>
+            */}
           </div>
         </motion.header>
 
@@ -95,44 +91,44 @@ const Placebooking = () => {
               <table className="w-full table-auto">
                 <thead>
                   <tr className="bg-gradient-to-r from-sky-100 to-emerald-50 text-sky-800">
-                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Customer</th>
-                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Destination</th>
-                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Email</th>
-                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Date</th>
-                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Seats</th>
-                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Status</th>
+                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Product Title</th>
+                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Booked By</th>
+                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Contact</th>
+                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Start Date</th>
+                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">End Date</th>
+                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Booked On</th>
+                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data?.map((booking) => (
+                  {bookings.map((booking) => (
                     <motion.tr
                       key={booking.id}
                       variants={childVariants}
                       className="border-b border-gray-100 hover:bg-sky-50/50 transition-colors duration-150"
                     >
-                      <td className="py-4 px-6 font-medium text-gray-800">{booking.customer}</td>
-                      <td className="py-4 px-6 text-gray-600">{booking.destination}</td>
-                      <td className="py-4 px-6 text-gray-600">{booking.email}</td>
-                      <td className="py-4 px-6 text-gray-600">{booking.date}</td>
-                      <td className="py-4 px-6 text-gray-600">{booking.seats}</td>
-                      <td className="py-4 px-6 text-gray-600">
-                        <span
-                          className={`px-3 py-1 rounded-full text-sm ${
-                            booking.status === 'Confirmed'
-                              ? 'bg-emerald-200 text-emerald-800'
-                              : 'bg-yellow-200 text-yellow-800'
-                          }`}
+                      <td className="py-4 px-6 font-medium text-gray-800">{booking.productTitle}</td>
+                      <td className="py-4 px-6 text-gray-600">{booking.userName}</td>
+                      <td className="py-4 px-6 text-gray-600">{booking.contact}</td>
+                      <td className="py-4 px-6 text-gray-600">{new Date(booking.startDate).toLocaleDateString()}</td>
+                      <td className="py-4 px-6 text-gray-600">{new Date(booking.endDate).toLocaleDateString()}</td>
+                      <td className="py-4 px-6 text-gray-600">{new Date(booking.createdAt).toLocaleString()}</td>
+                      <td className="py-4 px-6">
+                        <button
+                          onClick={() => handleDelete(booking.id)}
+                          className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                          title="Cancel Booking"
                         >
-                          {booking.status}
-                        </span>
+                          <Trash2 className="h-5 w-5" />
+                        </button>
                       </td>
                     </motion.tr>
                   ))}
                 </tbody>
               </table>
-              {data?.length === 0 && (
+              {bookings.length === 0 && (
                 <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg">No bookings found.</p>
+                  <p className="text-gray-500 text-lg">No bookings available at the moment.</p>
                 </div>
               )}
             </motion.div>
@@ -143,4 +139,4 @@ const Placebooking = () => {
   );
 };
 
-export default Placebooking;
+export default AdminPanel;
