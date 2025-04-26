@@ -25,7 +25,7 @@ export const addCategory = asyncHandler(async (req, res) => {
     const category = await Categorie.create({
         name,
         description,
-        image,
+        image:image.path,
     });
 
     return res.status(200).json(

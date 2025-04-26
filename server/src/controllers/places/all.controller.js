@@ -1,8 +1,9 @@
 import { asyncHandler, SuccessResponse } from "../../lib/index.js";
-export const getAllPlaces = asyncHandler(async (req, res) => {
+import { Place } from "../../models/place.model.js";
+export const getAllPlaces = asyncHandler(async (_, res) => {
+    const places = await Place.find();
+
     return res
         .status(200)
-        .json(
-            new SuccessResponse(200, "desired action done succesfully", null),
-        );
+        .json(new SuccessResponse(200, "all places fetched", places));
 });

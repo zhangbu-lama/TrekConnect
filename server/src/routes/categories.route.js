@@ -13,7 +13,7 @@ export const categoriesRouter = express.Router();
 categoriesRouter.get("/all", getAllCategories);
 categoriesRouter.get("/:id", getCategorieById);
 categoriesRouter.post("/add", upload.single("category_image"), addCategory);
-categoriesRouter.patch(
+categoriesRouter.put(
     "/update/:id",
     upload.single("category_image"),
     updateCategory,
