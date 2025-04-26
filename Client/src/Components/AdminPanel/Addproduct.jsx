@@ -3,19 +3,14 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { ArrowLeft, Edit, Trash2, Plus, X, Save, AlertCircle, Loader2 } from 'lucide-react';
-import {
-  useCategories,
-  useAddCategory,
-  useUpdateCategory,
-  useDeleteCategory,
-} from '../Hooks/useCategory';
-import useCategoryStore from '../Store/CategoryStore';
+import { v4 as uuidv4 } from 'uuid';
+import useProductStore from '../Store/useProductstore';
 import Layout from './Layout';
 
-// API Configuration (Assuming similar to AdminPanel)
+// API Configuration (Assuming similar to TrekAdminPanel)
 const BASE_URL = 'http://127.0.0.1:8000';
 
-// Animation Variants (Copied from AdminPanel)
+// Animation Variants (Copied from TrekAdminPanel)
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -35,38 +30,42 @@ const modalVariants = {
   exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
 };
 
-const CategoryAdminPanel = () => {
-  const { data: categories, isLoading, error } = useCategories();
-  const addCategoryMutation = useAddCategory();
-  const updateCategoryMutation = useUpdateCategory();
-  const deleteCategoryMutation = useDeleteCategory();
-  const { selectedCategory, setSelectedCategory } = useCategoryStore();
-
+const AdminPanel = () => {
+  const { products, addProduct, updateProduct, deleteProduct } = useProductStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   const { register, handleSubmit, reset, setValue, formState: { errors, isDirty } } = useForm({
     defaultValues: {
+      title: '',
       name: '',
+      price: '',
       description: '',
+      duration: 24,
       image: null,
     },
   });
 
-  // Sync form with selectedCategory
+  // Sync form with editing product
   useEffect(() => {
-    if (selectedCategory) {
-      setValue('name', selectedCategory.name || '');
-      setValue('description', selectedCategory.description || '');
-      setValue('image', null);
-      setImagePreview(selectedCategory.image ? `${BASE_URL}${selectedCategory.image}` : '');
-      setIsModalOpen(true);
+    if (editingId) {
+      const product = products.find((p) => p.id === editingId);
+      if (product) {
+        setValue('title', product.title || '');
+        setValue('name', product.name || '');
+        setValue('price', product.price || '');
+        setValue('description', product.description || '');
+        setValue('duration', product.duration || 24);
+        setValue('image', null);
+        setImagePreview(product.imageUrl ? `${BASE_URL}${product.imageUrl}` : '');
+      }
     } else {
       reset();
       setImagePreview('');
     }
-  }, [selectedCategory, setValue, reset]);
+  }, [editingId, products, setValue, reset]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -79,29 +78,45 @@ const CategoryAdminPanel = () => {
 
   const onSubmit = (data) => {
     const formData = new FormData();
+    formData.append('title', data.title);
     formData.append('name', data.name);
+    formData.append('price', data.price);
     formData.append('description', data.description);
+    formData.append('duration', data.duration);
     if (data.image) formData.append('image', data.image);
 
-    if (selectedCategory) {
-      updateCategoryMutation.mutate({ id: selectedCategory.id, data: formData });
+    const expiresAt = new Date(Date.now() + Number(data.duration) * 60 * 60 * 1000).toISOString();
+    const product = {
+      id: editingId || uuidv4(),
+      title: data.title,
+      name: data.name,
+      price: data.price,
+      description: data.description,
+      duration: data.duration,
+      imageUrl: data.image ? URL.createObjectURL(data.image) : (editingId ? products.find((p) => p.id === editingId)?.imageUrl : ''),
+      expiresAt,
+    };
+
+    if (editingId) {
+      updateProduct(editingId, product);
     } else {
-      addCategoryMutation.mutate(formData);
+      addProduct(product);
     }
 
     setIsModalOpen(false);
     reset();
+    setEditingId(null);
     setImagePreview('');
-    setSelectedCategory(null);
   };
 
-  const handleEdit = (category) => {
-    setSelectedCategory(category);
+  const startEdit = (product) => {
+    setEditingId(product.id);
+    setIsModalOpen(true);
   };
 
   const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this category?')) {
-      deleteCategoryMutation.mutate(id);
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      deleteProduct(id);
     }
   };
 
@@ -111,7 +126,7 @@ const CategoryAdminPanel = () => {
     } else {
       setIsModalOpen(false);
       reset();
-      setSelectedCategory(null);
+      setEditingId(null);
       setImagePreview('');
     }
   };
@@ -128,89 +143,85 @@ const CategoryAdminPanel = () => {
         >
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             <div className="flex items-center gap-6">
+
             <h1 className="text-4xl font-extrabold text-gray-500 tracking-tight">
-            Category Management Dashboard
+            Product Management Dashboard
               </h1>
             </div>
             <button
               onClick={() => {
                 reset();
+                setEditingId(null);
                 setImagePreview('');
-                setSelectedCategory(null);
                 setIsModalOpen(true);
               }}
               className="bg-white text-emerald-600 font-semibold py-3 px-6 rounded-full flex items-center gap-2 hover:bg-emerald-50 hover:text-emerald-700 transition-all duration-200 shadow-md"
             >
               <Plus className="h-5 w-5" />
-              Add New Category
+              Add New Product
             </button>
           </div>
         </motion.header>
 
         {/* Main Content */}
         <main className="max-w-7xl mx-auto px-6 py-12">
-          {isLoading && (
-            <div className="text-center py-16">
-              <Loader2 className="h-12 w-12 text-emerald-500 animate-spin mx-auto" />
-              <p className="text-lg font-medium text-gray-600 mt-4">Loading categories...</p>
-            </div>
-          )}
-          {error && (
-            <div className="text-center py-16 bg-red-50 rounded-lg p-6">
-              <p className="text-lg font-semibold text-red-600">Error: {error.message}</p>
-            </div>
-          )}
-          {!isLoading && !error && (
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100"
-            >
-              <table className="w-full table-auto">
-                <thead>
-                  <tr className="bg-gradient-to-r from-sky-100 to-emerald-50 text-sky-800">
-                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Name</th>
-                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Description</th>
-                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {categories?.map((category) => (
-                    <motion.tr
-                      key={category.id}
-                      variants={childVariants}
-                      className="border-b border-gray-100 hover:bg-sky-50/50 transition-colors duration-150"
-                    >
-                      <td className="py-4 px-6 font-medium text-gray-800">{category.name}</td>
-                      <td className="py-4 px-6 text-gray-600">{category.description}</td>
-                      <td className="py-4 px-6 flex gap-3">
-                        <button
-                          onClick={() => handleEdit(category)}
-                          className="text-sky-600 hover:text-sky-800 transition-colors duration-200"
-                          title="Edit Category"
-                        >
-                          <Edit className="h-5 w-5" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(category.id)}
-                          className="text-red-500 hover:text-red-700 transition-colors duration-200"
-                          title="Delete Category"
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </button>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
-              {categories?.length === 0 && (
-                <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg">No categories found. Add a new category to get started!</p>
-                </div>
-              )}
-            </motion.div>
-          )}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100"
+          >
+            <table className="w-full table-auto">
+              <thead>
+                <tr className="bg-gradient-to-r from-sky-100 to-emerald-50 text-sky-800">
+                  <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Title</th>
+                  <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Name</th>
+                  <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Price (Rs.)</th>
+                  <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Duration (hrs)</th>
+                  <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Expires At</th>
+                  <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products?.map((product) => (
+                  <motion.tr
+                    key={product.id}
+                    variants={childVariants}
+                    className="border-b border-gray-100 hover:bg-sky-50/50 transition-colors duration-150"
+                  >
+                    <td className="py-4 px-6 font-medium text-gray-800">{product.title}</td>
+                    <td className="py-4 px-6 text-gray-600">{product.name}</td>
+                    <td className="py-4 px-6 text-gray-600">{product.price}</td>
+                    <td className="py-4 px-6 text-gray-600">{product.duration}</td>
+                    <td className="py-4 px-6 text-gray-600">
+                      {new Date(product.expiresAt).toLocaleString()}
+                    </td>
+                    <td className="py-4 px-6 flex gap-3">
+                      <button
+                        onClick={() => startEdit(product)}
+                        className="text-sky-600 hover:text-sky-800 transition-colors duration-200"
+                        title="Edit Product"
+                      >
+                        <Edit className="h-5 w-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(product.id)}
+                        className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                        title="Delete Product"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+            {products?.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-500 text-lg">No products found. Add a new product to get started!</p>
+              </div>
+            )}
+          </motion.div>
         </main>
 
         {/* Add/Edit Modal */}
@@ -225,7 +236,7 @@ const CategoryAdminPanel = () => {
             >
               <div className="flex justify-between items-center mb-8">
                 <h2 className="text-3xl font-bold text-sky-800 tracking-tight">
-                  {selectedCategory ? 'Edit Category' : 'Add New Category'}
+                  {editingId ? 'Edit Product' : 'Add New Product'}
                 </h2>
                 <button
                   onClick={handleCancel}
@@ -237,21 +248,62 @@ const CategoryAdminPanel = () => {
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
                 {/* Basic Information */}
                 <div className="space-y-6">
-                  <h3 className="text-2xl font-semibold text-sky-800 border-b border-gray-200 pb-2">Category Information</h3>
+                  <h3 className="text-2xl font-semibold text-sky-800 border-b border-gray-200 pb-2">Product Information</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Category Name <span className="text-red-500">*</span>
-                        <span className="ml-2 text-gray-400" title="Enter the name of the category">
+                        Product Title <span className="text-red-500">*</span>
+                        <span className="ml-2 text-gray-400" title="Enter the title of the product">
                           <AlertCircle className="h-4 w-4 inline" />
                         </span>
                       </label>
                       <input
-                        {...register('name', { required: 'Category name is required' })}
+                        {...register('title', { required: 'Product title is required' })}
+                        className={`w-full p-3 border rounded-lg shadow-sm ${errors.title ? 'border-red-500' : 'border-gray-200'} focus:ring-2 focus:ring-emerald-400 focus:border-emerald-500 transition-all duration-200`}
+                        placeholder="e.g., Premium Widget"
+                      />
+                      {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Product Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        {...register('name', { required: 'Product name is required' })}
                         className={`w-full p-3 border rounded-lg shadow-sm ${errors.name ? 'border-red-500' : 'border-gray-200'} focus:ring-2 focus:ring-emerald-400 focus:border-emerald-500 transition-all duration-200`}
-                        placeholder="e.g., Adventure Trek"
+                        placeholder="e.g., Widget Pro"
                       />
                       {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Price (Rs.) <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        {...register('price', {
+                          required: 'Price is required',
+                          min: { value: 0, message: 'Price must be positive' },
+                        })}
+                        className={`w-full p-3 border rounded-lg shadow-sm ${errors.price ? 'border-red-500' : 'border-gray-200'} focus:ring-2 focus:ring-emerald-400 focus:border-emerald-500 transition-all duration-200`}
+                        placeholder="e.g., 999"
+                      />
+                      {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Duration (hrs) <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        {...register('duration', {
+                          required: 'Duration is required',
+                          min: { value: 1, message: 'Duration must be at least 1 hour' },
+                        })}
+                        className={`w-full p-3 border rounded-lg shadow-sm ${errors.duration ? 'border-red-500' : 'border-gray-200'} focus:ring-2 focus:ring-emerald-400 focus:border-emerald-500 transition-all duration-200`}
+                        placeholder="e.g., 24"
+                      />
+                      {errors.duration && <p className="text-red-500 text-sm mt-1">{errors.duration.message}</p>}
                     </div>
                   </div>
                   <div>
@@ -262,7 +314,7 @@ const CategoryAdminPanel = () => {
                       {...register('description', { required: 'Description is required' })}
                       className={`w-full p-3 border rounded-lg shadow-sm ${errors.description ? 'border-red-500' : 'border-gray-200'} focus:ring-2 focus:ring-emerald-400 focus:border-emerald-500 transition-all duration-200`}
                       rows="4"
-                      placeholder="Briefly describe the category..."
+                      placeholder="Enter product description..."
                     />
                     {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
                   </div>
@@ -270,11 +322,11 @@ const CategoryAdminPanel = () => {
 
                 {/* Image */}
                 <div className="space-y-6">
-                  <h3 className="text-2xl font-semibold text-sky-800 border-b border-gray-200 pb-2">Image</h3>
+                  <h3 className="text-2xl font-semibold text-sky-800 border-b border-gray-200 pb-2">Product Image</h3>
                   <div className="flex items-start gap-4">
                     <div className="flex-1">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Category Image (optional)
+                        Product Image <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
                         <input
@@ -289,7 +341,7 @@ const CategoryAdminPanel = () => {
                       <div className="relative">
                         <img
                           src={imagePreview}
-                          alt="Category Image Preview"
+                          alt="Product Image Preview"
                           className="h-20 w-20 object-cover rounded-lg shadow-sm"
                         />
                         <button
@@ -319,14 +371,9 @@ const CategoryAdminPanel = () => {
                   <button
                     type="submit"
                     className="px-6 py-3 bg-emerald-500 text-white rounded-full font-semibold flex items-center gap-2 hover:bg-emerald-600 transition-all duration-200 disabled:bg-emerald-300 disabled:cursor-not-allowed"
-                    disabled={addCategoryMutation.isLoading || updateCategoryMutation.isLoading}
                   >
-                    {addCategoryMutation.isLoading || updateCategoryMutation.isLoading ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <Save className="h-5 w-5" />
-                    )}
-                    {selectedCategory ? 'Update Category' : 'Add Category'}
+                    <Save className="h-5 w-5" />
+                    {editingId ? 'Update Product' : 'Add Product'}
                   </button>
                 </div>
               </form>
@@ -353,7 +400,7 @@ const CategoryAdminPanel = () => {
                         onClick={() => {
                           setIsModalOpen(false);
                           reset();
-                          setSelectedCategory(null);
+                          setEditingId(null);
                           setImagePreview('');
                           setShowCancelConfirm(false);
                         }}
@@ -373,4 +420,4 @@ const CategoryAdminPanel = () => {
   );
 };
 
-export default CategoryAdminPanel;
+export default AdminPanel;
