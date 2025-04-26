@@ -6,11 +6,16 @@ import {
     updateCategory,
     deleteCategory,
 } from "../controllers/index.js";
+import { upload } from "../middlewares/index.js";
 
 export const categoriesRouter = express.Router();
 
 categoriesRouter.get("/all", getAllCategories);
 categoriesRouter.get("/:id", getCategorieById);
-categoriesRouter.post("/add", addCategory);
-categoriesRouter.patch("/update/:id", updateCategory);
+categoriesRouter.post("/add", upload.single("category_image"), addCategory);
+categoriesRouter.patch(
+    "/update/:id",
+    upload.single("category_image"),
+    updateCategory,
+);
 categoriesRouter.delete("/delete/:id", deleteCategory);
