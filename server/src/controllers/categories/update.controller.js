@@ -32,7 +32,7 @@ export const updateCategory = asyncHandler(async (req, res) => {
 
     category.name = name;
     category.description = description;
-    category.image = isImageUpdated ? image : category.image;
+    category.image = isImageUpdated ? image.path : category.image;
     await category.save();
 
     return res
