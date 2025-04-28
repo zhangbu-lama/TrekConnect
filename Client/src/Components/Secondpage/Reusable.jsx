@@ -10,21 +10,27 @@ const IMAGE_BASE_URL = "http://localhost:8000";
 const TrekkingPage = () => {
   const { data: places = [], isLoading, isError } = usePlaces();
   const { filter, selectedCategory, setSelectedCategory } = usePlaceStore();
-  const [searchParams] = useSearchParams(); // Get query parameters
+  const [searchParams] = useSearchParams();
 
   // Set selectedCategory from URL query parameter on mount
   useEffect(() => {
     const categoryId = searchParams.get("category");
+    if (typeof setSelectedCategory !== "function") {
+      console.error("setSelectedCategory is not a function. Check usePlaceStore implementation.");
+      return;
+    }
     if (categoryId) {
-      setSelectedCategory(Number(categoryId)); // Convert to number and set in store
+      setSelectedCategory(categoryId); // Use string ID to match category._id
     } else {
-      setSelectedCategory(null); // Reset if no category is specified
+      setSelectedCategory(null);
     }
   }, [searchParams, setSelectedCategory]);
 
   const filteredPlaces = places.filter((place) => {
     const matchesFilter = place.name.toLowerCase().includes(filter.toLowerCase());
-    const matchesCategory = selectedCategory ? place.category === selectedCategory : true;
+    const matchesCategory = selectedCategory
+      ? place.category?._id === selectedCategory
+      : true;
     return matchesFilter && matchesCategory;
   });
 
@@ -44,17 +50,27 @@ const TrekkingPage = () => {
           transition={{ duration: 0.8 }}
           className="relative z-10"
         >
-          <h1 className="text-5xl font-bold text-white mb-4 drop-shadow-lg">Nepal Trekking Adventures</h1>
-          <p className="text-xl text-emerald-200 max-w-2xl mx-auto">Explore the Best of Nepal's Trekking Trails</p>
+          <h1 className="text-5xl font-bold text-white mb-4 drop-shadow-lg">
+            Nepal Trekking Adventures
+          </h1>
+          <p className="text-xl text-emerald-200 max-w-2xl mx-auto">
+            Explore the Best of Nepal's Trekking Trails
+          </p>
           <div className="mt-8">
-            <Link to="/bookingform" className="inline-flex items-center bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg transition">
+            <Link
+              to="/bookingform"
+              className="inline-flex items-center bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg transition"
+            >
               Start Your Journey <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </div>
         </motion.div>
         <div className="absolute bottom-0 left-0 w-full">
           <svg viewBox="0 0 1440 120" className="w-full h-auto">
-            <path fill="#f0f9ff" d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L0,120Z" />
+            <path
+              fill="#f0f9ff"
+              d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L0,120Z"
+            />
           </svg>
         </div>
       </header>
@@ -62,59 +78,80 @@ const TrekkingPage = () => {
       {/* Main */}
       <main className="flex-grow max-w-7xl mx-auto px-4 py-12">
         <section className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-sky-800 mb-4">Discover Breathtaking Trails</h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">Nepal offers some of the world's most spectacular trekking routes.</p>
+          <h2 className="text-3xl font-bold text-sky-800 mb-4">
+            Discover Breathtaking Trails
+          </h2>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            Nepal offers some of the world's most spectacular trekking routes.
+          </p>
         </section>
 
-        {isLoading && <div className="text-center py-10">Loading trekking places...</div>}
-        {isError && <div className="text-center py-10 text-red-500">Failed to load trekking places.</div>}
+        {isLoading && (
+          <div className="text-center py-10">Loading trekking places...</div>
+        )}
+        {isError && (
+          <div className="text-center py-10 text-red-500">
+            Failed to load trekking places.
+          </div>
+        )}
 
         {!isLoading && !isError && (
           <>
             {filteredPlaces.length === 0 ? (
-              <p className="text-center text-gray-500">No places match your filter.</p>
+              <p className="text-center text-gray-500">
+                No places match your filter.
+              </p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredPlaces.map((place, index) => (
                   <motion.div
-                    key={index}
+                    key={place._id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: index * 0.1 }}
                     className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition duration-300 flex flex-col h-full"
                   >
-                    {place.image && (
+                    {place.image ? (
                       <div className="relative h-52 overflow-hidden">
                         <img
                           src={`${IMAGE_BASE_URL}${place.image}`}
                           alt={place.name}
                           className="w-full h-full object-cover transition duration-500 hover:scale-105"
+                          onError={(e) => {
+                            e.target.src = "/fallback-image.jpg"; // Fallback image
+                          }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-40"></div>
+                      </div>
+                    ) : (
+                      <div className="relative h-52 overflow-hidden bg-gray-200 flex items-center justify-center">
+                        <p>No image available</p>
                       </div>
                     )}
 
                     <div className="p-5 flex-grow flex flex-col">
-                      <h2 className="text-2xl font-bold text-sky-700 mb-1">{place.name}</h2>
-
+                      <h2 className="text-2xl font-bold text-sky-700 mb-1">
+                        {place.name}
+                      </h2>
                       <div className="flex items-center mb-3 text-gray-500">
                         <MapPin className="h-4 w-4 mr-1 text-emerald-500 flex-shrink-0" />
                         <p className="text-sm italic">{place.location}</p>
                       </div>
-
-                      <p className="text-gray-700 mb-4 flex-grow">{place.description}</p>
-
+                      <p className="text-gray-700 mb-4 flex-grow">
+                        {place.description}
+                      </p>
                       <div className="mt-2 pt-3 border-t border-gray-100">
                         <div className="flex items-center text-emerald-600">
                           <Clock className="h-4 w-4 mr-2" />
-                          <span className="text-sm font-medium">Duration: {place.timetotravel || place.duration}</span>
+                          <span className="text-sm font-medium">
+                            Duration: {place.time_to_travel}
+                          </span>
                         </div>
                       </div>
                     </div>
-
                     <div className="px-5 pb-5">
                       <Link
-                        to={`/reusabledetails/${place.id}`}
+                        to={`/reusabledetails/${place._id}`}
                         className="block w-full text-center bg-sky-500 hover:bg-sky-600 text-white py-2 px-4 rounded-lg font-medium transition-colors"
                       >
                         Explore Trail
@@ -130,7 +167,9 @@ const TrekkingPage = () => {
 
       {/* Why Trek Section */}
       <section className="bg-gradient-to-r from-sky-100 to-emerald-50 rounded-xl shadow-lg p-8 mb-16 max-w-7xl mx-auto">
-        <h2 className="text-3xl font-bold text-sky-800 mb-6">Why Trek in Nepal?</h2>
+        <h2 className="text-3xl font-bold text-sky-800 mb-6">
+          Why Trek in Nepal?
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[
             {
@@ -149,9 +188,16 @@ const TrekkingPage = () => {
               text: "Experience unique cultures and traditions of mountain communities.",
             },
           ].map((card, i) => (
-            <div key={i} className="flex flex-col items-center text-center p-4 bg-white/70 rounded-lg shadow-sm">
-              <div className="bg-emerald-100 p-4 rounded-full mb-4 shadow-inner">{card.icon}</div>
-              <h3 className="text-xl font-semibold text-sky-700 mb-2">{card.title}</h3>
+            <div
+              key={i}
+              className="flex flex-col items-center text-center p-4 bg-white/70 rounded-lg shadow-sm"
+            >
+              <div className="bg-emerald-100 p-4 rounded-full mb-4 shadow-inner">
+                {card.icon}
+              </div>
+              <h3 className="text-xl font-semibold text-sky-700 mb-2">
+                {card.title}
+              </h3>
               <p className="text-gray-600">{card.text}</p>
             </div>
           ))}
@@ -176,7 +222,8 @@ const TrekkingPage = () => {
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
           <div>
             <p className="text-sky-100 mt-8">
-              Providing unforgettable trekking experiences in the Himalayas since 2005.
+              Providing unforgettable trekking experiences in the Himalayas since
+              2005.
             </p>
           </div>
           <div className="mt-8">
@@ -188,7 +235,7 @@ const TrekkingPage = () => {
             <ul className="space-y-2 mt-5">
               <li>
                 <Link
-                  href="/about"
+                  to="/about"
                   className="text-sky-100 hover:text-emerald-300 transition-colors"
                 >
                   About Us
@@ -196,7 +243,7 @@ const TrekkingPage = () => {
               </li>
               <li>
                 <Link
-                  href="/tours"
+                  to="/tours"
                   className="text-sky-100 hover:text-emerald-300 transition-colors"
                 >
                   Tours
@@ -204,7 +251,7 @@ const TrekkingPage = () => {
               </li>
               <li>
                 <Link
-                  href="/blog"
+                  to="/blog"
                   className="text-sky-100 hover:text-emerald-300 transition-colors"
                 >
                   Blog
@@ -212,7 +259,7 @@ const TrekkingPage = () => {
               </li>
               <li>
                 <Link
-                  href="/faq"
+                  to="/faq"
                   className="text-sky-100 hover:text-emerald-300 transition-colors"
                 >
                   FAQs
@@ -223,7 +270,8 @@ const TrekkingPage = () => {
         </div>
         <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-sky-600 text-center text-sky-200">
           <p>
-            © {new Date().getFullYear()} Nepal Trekking Adventures. All rights reserved.
+            © {new Date().getFullYear()} Nepal Trekking Adventures. All rights
+            reserved.
           </p>
         </div>
       </footer>
