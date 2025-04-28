@@ -9,7 +9,7 @@ export const updateCategory = asyncHandler(async (req, res) => {
     const catId = req.params.id;
     const name = req.body?.name ?? "";
     const description = req.body?.description ?? "";
-    const image = req.file ?? req.body.image;
+    const image = req?.file;
 
     if (!isValidObjectId(catId)) {
         throw new ErrorResponse(400, 6000, "invalid category id");
@@ -23,15 +23,12 @@ export const updateCategory = asyncHandler(async (req, res) => {
         throw new ErrorResponse(400, 6000, "updated description is required");
     }
 
-    if (!image && isImageUpdated) {
-        throw new ErrorResponse(400, 6000, "image is required");
-    }
-
     const category = await Categorie.findById(catId);
 
     category.name = name;
     category.description = description;
-    category.image = category.image == image ? category.image : image.filename;
+    category.image = image ? image.filename : category.image;
+
     await category.save();
 
     return res
