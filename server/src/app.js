@@ -14,7 +14,7 @@ const corsOption = {
 
 app.use(cors(corsOption));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true, limit: "16kb" }));
+app.use(express.urlencoded({ extended: true}));
 app.use(cookieParser());
 
 app.get("/", (_, res) => {
