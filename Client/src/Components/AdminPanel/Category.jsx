@@ -11,7 +11,6 @@ import {
 } from '../Hooks/useCategory';
 import useCategoryStore from '../Store/CategoryStore';
 import Layout from './Layout';
-
 // API Configuration (Assuming similar to AdminPanel)
 const BASE_URL = 'http://127.0.0.1:8000';
 
@@ -79,14 +78,26 @@ const CategoryAdminPanel = () => {
 
   const onSubmit = (data) => {
     const formData = new FormData();
+
+
     formData.append('name', data.name);
+
     formData.append('description', data.description);
-    if (data.image) formData.append('image', data.image);
+
+
+    if (data.image) formData.append('category_image', data.image);
+
+
 
     if (selectedCategory) {
-      updateCategoryMutation.mutate({ id: selectedCategory.id, data: formData });
+
+
+      updateCategoryMutation.mutate({ _id: selectedCategory._id, data: formData });
+
     } else {
+
       addCategoryMutation.mutate(formData);
+
     }
 
     setIsModalOpen(false);
@@ -193,7 +204,7 @@ const CategoryAdminPanel = () => {
                           <Edit className="h-5 w-5" />
                         </button>
                         <button
-                          onClick={() => handleDelete(category.id)}
+                          onClick={() => handleDelete(category._id)}
                           className="text-red-500 hover:text-red-700 transition-colors duration-200"
                           title="Delete Category"
                         >
@@ -288,7 +299,7 @@ const CategoryAdminPanel = () => {
                     {imagePreview && (
                       <div className="relative">
                         <img
-                          src={imagePreview}
+                          src={`${baseAPIurl}/${selectedCategory.image}` }
                           alt="Category Image Preview"
                           className="h-20 w-20 object-cover rounded-lg shadow-sm"
                         />

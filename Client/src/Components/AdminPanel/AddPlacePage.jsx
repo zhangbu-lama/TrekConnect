@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, Controller } from 'react-hook-form';
 import { fetchPlaces, addPlace, updatePlace, deletePlace } from '../api/Place';
-import { useCategories } from '../hooks/useCategory'; // Import the useCategories hook
+import { useCategories } from '../Hooks/useCategory'; // Import the useCategories hook
 import usePlaceStore from '../Store/placeStore';
 import {
   Container,

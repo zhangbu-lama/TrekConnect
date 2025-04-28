@@ -30,25 +30,24 @@ export const useAddCategory = () => {
   });
 };
 
+
 export const useUpdateCategory = () => {
+
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({ id, data }) => updateCategory({ id, data }),
+
+
+    mutationFn: ({ _id, data }) => updateCategory({ _id, data }),
     onSuccess: (updatedCategory) => {
       queryClient.setQueryData(['categories'], (oldCategories) =>
         oldCategories
           ? oldCategories.map((category) =>
-              category.id === updatedCategory.id ? updatedCategory : category
+              category._id === updatedCategory._id ? updatedCategory : category
             )
           : [updatedCategory]
       );
-      queryClient.invalidateQueries(['categories']);
-    },
-    onError: (error) => {
-      console.error('Error updating category:', error);
-    },
-  });
-};
+    }})};
 
 export const useDeleteCategory = () => {
   const queryClient = useQueryClient();
