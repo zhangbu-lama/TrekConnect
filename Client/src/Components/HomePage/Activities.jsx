@@ -5,7 +5,7 @@ import { fetchCategories } from "../api/Category";
 import boulderImage from "../../assets/boulder.png";
 import riccardoImage from "../../assets/pexels-riccardo-303040.webp";
 
-const BASE_URL = "http://localhost:8000"; 
+const BASE_URL = 'http://localhost:8000/api'; 
 
 const Activities = () => {
   const [categories, setCategories] = useState([]);

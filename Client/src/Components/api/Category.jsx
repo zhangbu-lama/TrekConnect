@@ -14,13 +14,13 @@ export const addCategory = async (data) => {
 };
 
 export const updateCategory = async ({ _id, data }) => {
-  const response = await axiosInstance.put(`/categories/update/${_id}/`, data);
+  const response = await axiosInstance.put(`/categories/update/${_id}`, data);
   return response.data.data;
 }
 
 
 export const deleteCategory = async (id) => {
-  const response = await axiosInstance.delete(`/categories/delete/${id}/`);
+  const response = await axiosInstance.delete(`/categories/delete/${id}`);
   return response.data;
 };
 

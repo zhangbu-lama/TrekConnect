@@ -104,7 +104,7 @@ const Sidebar = () => {
             <path d="M12 2v4" />
             <path d="M12 18v4" />
           </svg>
-          <div className="text-xl font-bold text-teal-600">TravelSphere</div>
+          <div className="text-xl font-bold text-teal-600">TravelNepal</div>
         </div>
 
         {/* Navigation */}
@@ -135,7 +135,7 @@ const Sidebar = () => {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-800">Admin</p>
-              <p className="text-xs text-gray-500">TravelSphere</p>
+              <p className="text-xs text-gray-500">travelnepal</p>
             </div>
           </div>
         </div>
