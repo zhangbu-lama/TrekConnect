@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, Edit, Trash2, Plus, X, Save, AlertCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Plus, X, Save, AlertCircle, Loader2, CheckCircle, RefreshCw } from 'lucide-react';
 import {
   useCategories,
   useAddCategory,
@@ -13,10 +12,10 @@ import useCategoryStore from '../Store/CategoryStore';
 import Layout from './Layout';
 import { baseAPIurl } from '../../constant';
 
-// API Configuration (Assuming similar to AdminPanel)
-const BASE_URL = 'http://127.0.0.1:8000';
+// API Configuration
+const BASE_URL = 'http://localhost:8000/api';
 
-// Animation Variants (Copied from AdminPanel)
+// Animation Variants
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -36,8 +35,14 @@ const modalVariants = {
   exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
 };
 
+const toastVariants = {
+  hidden: { opacity: 0, y: -20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+  exit: { opacity: 0, y: -20, transition: { duration: 0.2 } },
+};
+
 const CategoryAdminPanel = () => {
-  const { data: categories, isLoading, error } = useCategories();
+  const { data: categories, isLoading, error, refetch } = useCategories();
   const addCategoryMutation = useAddCategory();
   const updateCategoryMutation = useUpdateCategory();
   const deleteCategoryMutation = useDeleteCategory();
@@ -46,6 +51,7 @@ const CategoryAdminPanel = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState('');
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
   const { register, handleSubmit, reset, setValue, formState: { errors, isDirty } } = useForm({
     defaultValues: {
@@ -54,6 +60,11 @@ const CategoryAdminPanel = () => {
       image: null,
     },
   });
+
+  // Debug categories data
+  useEffect(() => {
+    console.log('Categories data:', categories);
+  }, [categories]);
 
   // Sync form with selectedCategory
   useEffect(() => {
@@ -69,9 +80,50 @@ const CategoryAdminPanel = () => {
     }
   }, [selectedCategory, setValue, reset]);
 
+  // Handle mutation feedback
+  useEffect(() => {
+    if (addCategoryMutation.isSuccess) {
+      setToast({ show: true, message: 'Category added successfully!', type: 'success' });
+      setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
+    }
+    if (addCategoryMutation.isError) {
+      setToast({ show: true, message: `Failed to add category: ${addCategoryMutation.error.message}`, type: 'error' });
+      setTimeout(() => setToast({ show: false, message: '', type: 'error' }), 5000);
+    }
+    if (updateCategoryMutation.isSuccess) {
+      setToast({ show: true, message: 'Category updated successfully!', type: 'success' });
+      setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
+    }
+    if (updateCategoryMutation.isError) {
+      setToast({ show: true, message: `Failed to update category: ${updateCategoryMutation.error.message}`, type: 'error' });
+      setTimeout(() => setToast({ show: false, message: '', type: 'error' }), 5000);
+    }
+    if (deleteCategoryMutation.isSuccess) {
+      setToast({ show: true, message: 'Category deleted successfully!', type: 'success' });
+      setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
+    }
+    if (deleteCategoryMutation.isError) {
+      setToast({ show: true, message: `Failed to delete category: ${deleteCategoryMutation.error.message}`, type: 'error' });
+      setTimeout(() => setToast({ show: false, message: '', type: 'error' }), 5000);
+    }
+  }, [
+    addCategoryMutation.isSuccess,
+    addCategoryMutation.isError,
+    updateCategoryMutation.isSuccess,
+    updateCategoryMutation.isError,
+    deleteCategoryMutation.isSuccess,
+    deleteCategoryMutation.isError,
+    addCategoryMutation.error,
+    updateCategoryMutation.error,
+    deleteCategoryMutation.error,
+  ]);
+
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (imagePreview && imagePreview.startsWith('blob:')) {
+        URL.revokeObjectURL(imagePreview);
+      }
       const url = URL.createObjectURL(file);
       setImagePreview(url);
       setValue('image', file);
@@ -119,20 +171,40 @@ const CategoryAdminPanel = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-sky-50 via-sky-100 to-emerald-50 font-sans">
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-gray-50 to-emerald-50 font-sans">
+        {/* Toast Notification */}
+        <AnimatePresence>
+          {toast.show && (
+            <motion.div
+              variants={toastVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg flex items-center gap-2 z-50 ${
+                toast.type === 'success' ? 'bg-teal-500 text-white' : 'bg-red-500 text-white'
+              }`}
+            >
+              {toast.type === 'success' ? (
+                <CheckCircle className="h-5 w-5" />
+              ) : (
+                <AlertCircle className="h-5 w-5" />
+              )}
+              <span>{toast.message}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Header */}
         <motion.header
-          className="bg-gradient-to-r from-sky-700 via-sky-600 to-emerald-500 py-8 px-6 shadow-lg"
+          className="bg-gradient-to-r from-teal-600 via-teal-500 to-emerald-500 py-8 px-6 shadow-lg"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
         >
           <div className="max-w-7xl mx-auto flex justify-between items-center">
-            <div className="flex items-center gap-6">
-            <h1 className="text-4xl font-extrabold text-gray-500 tracking-tight">
-            Category Management Dashboard
-              </h1>
-            </div>
+            <h1 className="text-4xl font-bold text-zinc-600">
+              Category Management
+            </h1>
             <button
               onClick={() => {
                 reset();
@@ -140,10 +212,10 @@ const CategoryAdminPanel = () => {
                 setSelectedCategory(null);
                 setIsModalOpen(true);
               }}
-              className="bg-white text-emerald-600 font-semibold py-3 px-6 rounded-full flex items-center gap-2 hover:bg-emerald-50 hover:text-emerald-700 transition-all duration-200 shadow-md"
+              className="bg-white text-teal-600 font-semibold py-3 px-6 rounded-full flex items-center gap-2 hover:bg-teal-50 hover:text-teal-700 transition-all duration-200 shadow-md"
             >
               <Plus className="h-5 w-5" />
-              Add New Category
+              Add Category
             </button>
           </div>
         </motion.header>
@@ -152,13 +224,20 @@ const CategoryAdminPanel = () => {
         <main className="max-w-7xl mx-auto px-6 py-12">
           {isLoading && (
             <div className="text-center py-16">
-              <Loader2 className="h-12 w-12 text-emerald-500 animate-spin mx-auto" />
+              <Loader2 className="h-12 w-12 text-teal-500 animate-spin mx-auto" />
               <p className="text-lg font-medium text-gray-600 mt-4">Loading categories...</p>
             </div>
           )}
           {error && (
             <div className="text-center py-16 bg-red-50 rounded-lg p-6">
               <p className="text-lg font-semibold text-red-600">Error: {error.message}</p>
+              <button
+                onClick={() => refetch()}
+                className="mt-4 px-4 py-2 bg-teal-500 text-white rounded-full flex items-center gap-2 hover:bg-teal-600 transition-all duration-200"
+              >
+                <RefreshCw className="h-5 w-5" />
+                Retry
+              </button>
             </div>
           )}
           {!isLoading && !error && (
@@ -166,50 +245,66 @@ const CategoryAdminPanel = () => {
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100"
+              className="bg-white rounded-2xl shadow-xl overflow-x-auto border border-gray-100"
             >
               <table className="w-full table-auto">
                 <thead>
-                  <tr className="bg-gradient-to-r from-sky-100 to-emerald-50 text-sky-800">
+                  <tr className="bg-gradient-to-r from-teal-100 to-emerald-100 text-teal-800">
                     <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Name</th>
                     <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Description</th>
+                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Image</th>
                     <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {categories?.map((category) => (
-                    <motion.tr
-                      key={category.id}
-                      variants={childVariants}
-                      className="border-b border-gray-100 hover:bg-sky-50/50 transition-colors duration-150"
-                    >
-                      <td className="py-4 px-6 font-medium text-gray-800">{category.name}</td>
-                      <td className="py-4 px-6 text-gray-600">{category.description}</td>
-                      <td className="py-4 px-6 flex gap-3">
-                        <button
-                          onClick={() => handleEdit(category)}
-                          className="text-sky-600 hover:text-sky-800 transition-colors duration-200"
-                          title="Edit Category"
-                        >
-                          <Edit className="h-5 w-5" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(category._id)}
-                          className="text-red-500 hover:text-red-700 transition-colors duration-200"
-                          title="Delete Category"
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </button>
+                  {categories?.length > 0 ? (
+                    categories.map((category) => (
+                      <motion.tr
+                        key={category._id}
+                        variants={childVariants}
+                        className="border-b border-gray-100 hover:bg-teal-50/30 transition-colors duration-150"
+                      >
+                        <td className="py-4 px-6 font-medium text-gray-800">{category.name}</td>
+                        <td className="py-4 px-6 text-gray-600">{category.description}</td>
+                        <td className="py-4 px-6">
+                          {category.image ? (
+                            <img
+                              src={`${BASE_URL}${category.image}`}
+                              alt={category.name}
+                              className="h-10 w-10 object-cover rounded-md"
+                              onError={(e) => (e.target.src = '/fallback-image.jpg')} // Fallback for broken images
+                            />
+                          ) : (
+                            <span className="text-gray-400">No image</span>
+                          )}
+                        </td>
+                        <td className="py-4 px-6 flex gap-3">
+                          <button
+                            onClick={() => handleEdit(category)}
+                            className="text-teal-600 hover:text-teal-800 transition-colors duration-200"
+                            title="Edit Category"
+                          >
+                            <Edit className="h-5 w-5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(category._id)}
+                            className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                            title="Delete Category"
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </button>
+                        </td>
+                      </motion.tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="4" className="py-12 text-center text-gray-500 text-lg">
+                        No categories found. Add a new category to get started!
                       </td>
-                    </motion.tr>
-                  ))}
+                    </tr>
+                  )}
                 </tbody>
               </table>
-              {categories?.length === 0 && (
-                <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg">No categories found. Add a new category to get started!</p>
-                </div>
-              )}
             </motion.div>
           )}
         </main>
@@ -222,87 +317,116 @@ const CategoryAdminPanel = () => {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="bg-white rounded-2xl p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+              className="bg-gray-50 rounded-2xl p-10 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
             >
               <div className="flex justify-between items-center mb-8">
-                <h2 className="text-3xl font-bold text-sky-800 tracking-tight">
+                <h2 className="text-3xl font-bold text-teal-800 tracking-tight">
                   {selectedCategory ? 'Edit Category' : 'Add New Category'}
                 </h2>
                 <button
                   onClick={handleCancel}
                   className="text-gray-500 hover:text-gray-700 transition-colors duration-200"
+                  aria-label="Close modal"
                 >
                   <X className="h-7 w-7" />
                 </button>
               </div>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
+              <form id="category-form" onSubmit={handleSubmit(onSubmit)} className="space-y-12">
                 {/* Basic Information */}
                 <div className="space-y-6">
-                  <h3 className="text-2xl font-semibold text-sky-800 border-b border-gray-200 pb-2">Category Information</h3>
+                  <h3 className="text-2xl font-semibold text-teal-800 border-b border-gray-200 pb-2">Category Details</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
                         Category Name <span className="text-red-500">*</span>
-                        <span className="ml-2 text-gray-400" title="Enter the name of the category">
-                          <AlertCircle className="h-4 w-4 inline" />
-                        </span>
                       </label>
                       <input
                         {...register('name', { required: 'Category name is required' })}
-                        className={`w-full p-3 border rounded-lg shadow-sm ${errors.name ? 'border-red-500' : 'border-gray-200'} focus:ring-2 focus:ring-emerald-400 focus:border-emerald-500 transition-all duration-200`}
-                        placeholder="e.g., Adventure Trek"
+                        className={`w-full p-4 text-lg border rounded-lg shadow-sm ${errors.name ? 'border-red-500' : 'border-gray-200'} focus:ring-2 focus:ring-teal-400 focus:border-teal-500 transition-all duration-200`}
+                        placeholder="Enter category name"
+                        aria-invalid={errors.name ? 'true' : 'false'}
                       />
-                      {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+                      {errors.name && (
+                        <p className="text-red-500 text-sm mt-2 flex items-center gap-1">
+                          <AlertCircle className="h-4 w-4" />
+                          {errors.name.message}
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
                       Description <span className="text-red-500">*</span>
                     </label>
                     <textarea
                       {...register('description', { required: 'Description is required' })}
-                      className={`w-full p-3 border rounded-lg shadow-sm ${errors.description ? 'border-red-500' : 'border-gray-200'} focus:ring-2 focus:ring-emerald-400 focus:border-emerald-500 transition-all duration-200`}
-                      rows="4"
-                      placeholder="Briefly describe the category..."
+                      className={`w-full p-4 text-lg border rounded-lg shadow-sm ${errors.description ? 'border-red-500' : 'border-gray-200'} focus:ring-2 focus:ring-teal-400 focus:border-teal-500 transition-all duration-200`}
+                      rows="5"
+                      placeholder="Describe the category..."
+                      aria-invalid={errors.description ? 'true' : 'false'}
                     />
-                    {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
+                    {errors.description && (
+                      <p className="text-red-500 text-sm mt-2 flex items-center gap-1">
+                        <AlertCircle className="h-4 w-4" />
+                        {errors.description.message}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 {/* Image */}
                 <div className="space-y-6">
-                  <h3 className="text-2xl font-semibold text-sky-800 border-b border-gray-200 pb-2">Image</h3>
-                  <div className="flex items-start gap-4">
+                  <h3 className="text-2xl font-semibold text-teal-800 border-b border-gray-200 pb-2">Category Image</h3>
+                  <div className="flex items-start gap-6">
                     <div className="flex-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Category Image (optional)
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Upload Image (optional)
                       </label>
                       <div className="relative">
                         <input
                           type="file"
                           accept="image/*"
                           onChange={handleImageUpload}
-                          className="w-full p-3 border rounded-lg shadow-sm border-gray-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 transition-all duration-200"
+                          className="w-full p-4 text-lg border border-gray-200 rounded-lg shadow-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 transition-all duration-200"
+                          aria-label="Upload category image"
                         />
                       </div>
                     </div>
                     {imagePreview && (
-                      <div className="relative">
+                      <div className="relative flex items-center gap-3">
                         <img
                           src={`${baseAPIurl}/${selectedCategory.image}` }
                           alt="Category Image Preview"
-                          className="h-20 w-20 object-cover rounded-lg shadow-sm"
+                          className="h-24 w-24 object-cover rounded-lg shadow-sm"
                         />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setImagePreview('');
-                            setValue('image', null);
-                          }}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors duration-200"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
+                        <div className="flex flex-col gap-3">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (imagePreview && imagePreview.startsWith('blob:')) {
+                                URL.revokeObjectURL(imagePreview);
+                              }
+                              setImagePreview('');
+                              setValue('image', null);
+                            }}
+                            className="px-4 py-2 border border-gray-200 text-gray-700 rounded-full font-semibold hover:bg-gray-100 transition-all duration-200 focus:ring-2 focus:ring-teal-400"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            form="category-form"
+                            className="px-4 py-2 bg-teal-500 text-white rounded-full font-semibold flex items-center gap-2 hover:bg-teal-600 transition-all duration-200 disabled:bg-teal-300 disabled:cursor-not-allowed focus:ring-2 focus:ring-teal-400"
+                            disabled={addCategoryMutation.isLoading || updateCategoryMutation.isLoading}
+                          >
+                            {addCategoryMutation.isLoading || updateCategoryMutation.isLoading ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Save className="h-4 w-4" />
+                            )}
+                            Submit
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -313,14 +437,16 @@ const CategoryAdminPanel = () => {
                   <button
                     type="button"
                     onClick={handleCancel}
-                    className="px-6 py-3 border border-gray-200 text-gray-700 rounded-full font-semibold hover:bg-gray-100 transition-all duration-200"
+                    className="px-6 py-3 border border-gray-200 text-gray-700 rounded-full font-semibold hover:bg-gray-100 transition-all duration-200 focus:ring-2 focus:ring-teal-400"
+                    aria-label="Cancel form"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-3 bg-emerald-500 text-white rounded-full font-semibold flex items-center gap-2 hover:bg-emerald-600 transition-all duration-200 disabled:bg-emerald-300 disabled:cursor-not-allowed"
+                    className="px-6 py-3 bg-emerald-500 text-white rounded-full font-semibold flex items-center gap-2 hover:bg-emerald-600 transition-all duration-200 disabled:bg-emerald-300 disabled:cursor-not-allowed focus:ring-2 focus:ring-teal-400"
                     disabled={addCategoryMutation.isLoading || updateCategoryMutation.isLoading}
+                    aria-label={selectedCategory ? 'Update category' : 'Add category'}
                   >
                     {addCategoryMutation.isLoading || updateCategoryMutation.isLoading ? (
                       <Loader2 className="h-5 w-5 animate-spin" />
@@ -328,6 +454,20 @@ const CategoryAdminPanel = () => {
                       <Save className="h-5 w-5" />
                     )}
                     {selectedCategory ? 'Update Category' : 'Add Category'}
+                  </button>
+                  <button
+                    type="submit"
+                    form="category-form"
+                    className="px-10 py-4 bg-teal-500 text-gray-600 rounded-full font-bold flex items-center gap-2 hover:bg-teal-600 hover:scale-105 transition-all duration-200 disabled:bg-teal-300 disabled:cursor-not-allowed shadow-lg focus:ring-2 focus:ring-teal-400"
+                    disabled={addCategoryMutation.isLoading || updateCategoryMutation.isLoading}
+                    aria-label="Confirm submission"
+                  >
+                    {addCategoryMutation.isLoading || updateCategoryMutation.isLoading ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <CheckCircle className="h-5 w-5" />
+                    )}
+                    Confirm
                   </button>
                 </div>
               </form>
@@ -341,12 +481,12 @@ const CategoryAdminPanel = () => {
                     exit={{ opacity: 0, scale: 0.95 }}
                     className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl"
                   >
-                    <h3 className="text-lg font-semibold text-sky-800">Confirm Cancel</h3>
+                    <h3 className="text-lg font-semibold text-teal-800">Confirm Cancel</h3>
                     <p className="text-gray-600 mt-2">Are you sure you want to cancel? All unsaved changes will be lost.</p>
                     <div className="flex justify-end gap-4 mt-6">
                       <button
                         onClick={() => setShowCancelConfirm(false)}
-                        className="px-4 py-2 border border-gray-200 rounded-full text-gray-700 hover:bg-gray-100 transition-all duration-200"
+                        className="px-4 py-2 border border-gray-200 rounded-full text-gray-700 hover:bg-gray-100 transition-all duration-200 focus:ring-2 focus:ring-teal-400"
                       >
                         Stay
                       </button>
@@ -358,7 +498,7 @@ const CategoryAdminPanel = () => {
                           setImagePreview('');
                           setShowCancelConfirm(false);
                         }}
-                        className="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all duration-200"
+                        className="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all duration-200 focus:ring-2 focus:ring-red-400"
                       >
                         Confirm Cancel
                       </button>
