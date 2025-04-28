@@ -61,10 +61,6 @@ const CategoryAdminPanel = () => {
     },
   });
 
-  // Debug categories data
-  useEffect(() => {
-    console.log('Categories data:', categories);
-  }, [categories]);
 
   // Sync form with selectedCategory
   useEffect(() => {
@@ -72,7 +68,7 @@ const CategoryAdminPanel = () => {
       setValue('name', selectedCategory.name || '');
       setValue('description', selectedCategory.description || '');
       setValue('image', null);
-      setImagePreview(selectedCategory.image ? `${BASE_URL}${selectedCategory.image}` : '');
+      setImagePreview(selectedCategory.image ? `${baseAPIurl}/uploads/${selectedCategory.image}` : '');
       setIsModalOpen(true);
     } else {
       reset();
@@ -269,10 +265,9 @@ const CategoryAdminPanel = () => {
                         <td className="py-4 px-6">
                           {category.image ? (
                             <img
-                              src={`${BASE_URL}${category.image}`}
+                              src={`${baseAPIurl}/uploads/${category.image}`}
                               alt={category.name}
                               className="h-10 w-10 object-cover rounded-md"
-                              onError={(e) => (e.target.src = '/fallback-image.jpg')} // Fallback for broken images
                             />
                           ) : (
                             <span className="text-gray-400">No image</span>
@@ -395,7 +390,7 @@ const CategoryAdminPanel = () => {
                     {imagePreview && (
                       <div className="relative flex items-center gap-3">
                         <img
-                          src={`${baseAPIurl}/${selectedCategory.image}` }
+                          src={`${baseAPIurl}/uploads/${selectedCategory?.image}` }
                           alt="Category Image Preview"
                           className="h-24 w-24 object-cover rounded-lg shadow-sm"
                         />

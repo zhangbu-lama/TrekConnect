@@ -66,26 +66,13 @@ export const useUpdateCategory = () => {
       await queryClient.cancelQueries(['categories']);
       const previousCategories = queryClient.getQueryData(['categories']);
       return { previousCategories };
-    },
-    onSuccess: (response) => {
-      console.log('Update category response in hook:', response);
-      const updatedCategory = response.data || response;
-      if (updatedCategory && updatedCategory._id) {
-        queryClient.setQueryData(['categories'], (oldCategories) => {
-          const categories = Array.isArray(oldCategories) ? oldCategories : [];
-          return categories.map((category) =>
-            category._id === updatedCategory._id ? updatedCategory : category
-          );
-        });
-      } else {
-        console.warn('No valid category data in response:', response);
-      }
-      queryClient.invalidateQueries(['categories']);
-    },
+    }},
+
     onError: (error, variables, context) => {
       console.error('Error updating category:', error);
       queryClient.setQueryData(['categories'], context.previousCategories);
     },
+
     onSettled: () => {
       queryClient.invalidateQueries(['categories']);
     },
