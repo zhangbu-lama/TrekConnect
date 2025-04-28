@@ -9,6 +9,10 @@ const trekSchema = new mongoose.Schema(
         difficulty: {
             type: String,
         },
+        place: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Place",
+        },
         duration: {
             type: String,
         },
