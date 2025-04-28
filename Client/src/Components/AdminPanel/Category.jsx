@@ -10,6 +10,7 @@ import {
 } from '../Hooks/useCategory';
 import useCategoryStore from '../Store/CategoryStore';
 import Layout from './Layout';
+import { baseAPIurl } from '../../constant';
 
 // API Configuration
 const BASE_URL = 'http://localhost:8000/api';
@@ -394,7 +395,7 @@ const CategoryAdminPanel = () => {
                     {imagePreview && (
                       <div className="relative flex items-center gap-3">
                         <img
-                          src={imagePreview}
+                          src={`${baseAPIurl}/${selectedCategory.image}` }
                           alt="Category Image Preview"
                           className="h-24 w-24 object-cover rounded-lg shadow-sm"
                         />

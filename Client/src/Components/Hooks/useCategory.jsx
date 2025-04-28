@@ -53,6 +53,14 @@ export const useUpdateCategory = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ _id, data }) => updateCategory({ _id, data }),
+    onSuccess: (updatedCategory) => {
+      queryClient.setQueryData(['categories'], (oldCategories) =>
+        oldCategories
+          ? oldCategories.map((category) =>
+              category._id === updatedCategory._id ? updatedCategory : category
+            )
+          : [updatedCategory]
+      );
     onMutate: async ({ _id, data }) => {
       console.log('Updating category:', _id, data);
       await queryClient.cancelQueries(['categories']);
