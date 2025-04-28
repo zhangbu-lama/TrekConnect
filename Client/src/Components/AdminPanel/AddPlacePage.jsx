@@ -49,7 +49,7 @@ const AdminPlaces = () => {
       category: '',
       related_name: '',
       time_to_travel: '',
-      image: null,
+     image: null,
     },
   });
 
@@ -111,7 +111,7 @@ const AdminPlaces = () => {
     formData.append('related_name', data.related_name || '');
     formData.append('time_to_travel', data.time_to_travel);
     if (data.image && data.image[0]) {
-      formData.append('image', data.image[0]);
+      formData.append('place_image', data.image[0]);
     }
 
     if (editingPlace) {
