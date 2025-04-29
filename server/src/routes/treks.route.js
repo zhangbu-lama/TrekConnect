@@ -8,12 +8,13 @@ import {
     getTreksByPlaceId,
     updateTrek,
 } from "../controllers/index.js";
+import { upload } from "../middlewares/index.js";
 
 export const treksRouter = express.Router();
 
 treksRouter.get("/all", getAllTreks);
 treksRouter.get("/:id", getTrekById);
 treksRouter.get("/place/:id", getTreksByPlaceId);
-treksRouter.post("/add", addTrek);
+treksRouter.post("/add", upload.array("photos"), addTrek);
 treksRouter.delete("/delete/:id", deleteTrek);
 treksRouter.patch("/udpate/:id", updateTrek);

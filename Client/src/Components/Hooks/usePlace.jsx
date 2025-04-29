@@ -21,7 +21,7 @@ export const useAddPlace = () => {
 export const useUpdatePlace = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }) => updatePlace(id, data),
+    mutationFn: ({ _id, data }) => updatePlace(_id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['places'] });
     },

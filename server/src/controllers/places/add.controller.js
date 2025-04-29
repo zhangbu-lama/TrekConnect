@@ -5,6 +5,7 @@ import {
 } from "../../lib/index.js";
 import { Place } from "../../models/place.model.js";
 export const addPlace = asyncHandler(async (req, res) => {
+    console.log(req.body);
     const name = req.body?.name;
     const location = req.body?.location;
     const description = req.body?.description;
@@ -13,33 +14,30 @@ export const addPlace = asyncHandler(async (req, res) => {
     const image = req.file;
     const timeToTravel = req.body?.time_to_travel;
 
-    // Validate required fields
-    if (
-        !name ||
-        !location ||
-        !description ||
-        !category ||
-        !relatedName ||
-        !image ||
-        !timeToTravel
-    ) {
-        return res
-            .status(400)
-            .json(new ErrorResponse(400, 6000, "All fields are required"));
+    if (!name) {
+        throw new ErrorResponse(400, 6000, "name is required");
     }
-    // Validate image type
-    const allowedImageTypes = ["image/jpeg", "image/png", "image/jpg"];
-    if (!allowedImageTypes.includes(image.mimetype)) {
-        return res
-            .status(400)
-            .json(new ErrorResponse(400, 6001, "Invalid image type"));
+
+    if (!location) {
+        throw new ErrorResponse(400, 6000, "location is required");
     }
-    // Validate image size (5MB limit)
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (image.size > maxSize) {
-        return res
-            .status(400)
-            .json(new ErrorResponse(400, 6002, "Image size exceeds 5MB limit"));
+    if (!description) {
+        throw new ErrorResponse(400, 6000, "description is required");
+    }
+    if (!category) {
+        throw new ErrorResponse(400, 6000, "category is required");
+    }
+    if (!relatedName) {
+        throw new ErrorResponse(400, 6000, "related_name is required");
+    }
+    if (!image) {
+        throw new ErrorResponse(400, 6000, "image is required");
+    }
+    if (!timeToTravel) {
+        throw new ErrorResponse(400, 6000, "time_to_travel is required");
+    }
+    if (!image) {
+        throw new ErrorResponse(400, 6000, "image is required");
     }
 
     const place = await Place.create({
@@ -48,7 +46,7 @@ export const addPlace = asyncHandler(async (req, res) => {
         description,
         category,
         related_name: relatedName,
-        image: image.path,
+        image: image.filename,
         time_to_travel: timeToTravel,
     });
 

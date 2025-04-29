@@ -1,8 +1,10 @@
 import { asyncHandler, SuccessResponse } from "../../lib/index.js";
-export const getAllTreks = asyncHandler(async (req, res) => {
+import { Trek } from "../../models/index.js";
+
+export const getAllTreks = asyncHandler(async (_, res) => {
+    const treks = await Trek.find();
+
     return res
         .status(200)
-        .json(
-            new SuccessResponse(200, "desired action done succesfully", null),
-        );
+        .json(new SuccessResponse(200, "fetched all treks succesfully", treks));
 });

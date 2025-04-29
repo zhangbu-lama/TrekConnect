@@ -1,10 +1,10 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 const usePlaceStore = create((set) => ({
-  filter: '',
+  filter: "",
   setFilter: (newFilter) => set({ filter: newFilter }),
-  selectedCategory: null,
-  setSelectedCategory: (category) => set({ selectedCategory: category }),
+  selectedPlace: null,
+  setSelectedPlace: (place) => set({ selectedPlace: place }),
 }));
 
 export default usePlaceStore;
