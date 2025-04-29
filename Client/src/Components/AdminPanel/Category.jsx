@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
-<<<<<<< HEAD
-=======
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { ArrowLeft, Edit, Trash2, Plus, X, Save, AlertCircle, Loader2, CheckCircle, RefreshCw } from 'lucide-react';
->>>>>>> 35db7a5d9a51e002f121b2a02717464c47f87411
 import {
   useCategories,
   useAddCategory,
@@ -15,10 +12,8 @@ import useCategoryStore from '../Store/CategoryStore';
 import Layout from './Layout';
 import { baseAPIurl } from '../../constant';
 
-<<<<<<< HEAD
 const CategoryAdminPanel = () => {
   const { data: categories, isLoading } = useCategories();
-=======
 // API Configuration
 const BASE_URL = 'http://localhost:8000/api';
 
@@ -50,14 +45,12 @@ const toastVariants = {
 
 const CategoryAdminPanel = () => {
   const { data: categories, isLoading, error, refetch } = useCategories();
->>>>>>> 35db7a5d9a51e002f121b2a02717464c47f87411
   const addCategoryMutation = useAddCategory();
   const updateCategoryMutation = useUpdateCategory();
   const deleteCategoryMutation = useDeleteCategory();
 
   const { selectedCategory, setSelectedCategory } = useCategoryStore();
 
-<<<<<<< HEAD
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -71,7 +64,6 @@ const CategoryAdminPanel = () => {
         description: selectedCategory.description || '',
         image: null,
       });
-=======
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState('');
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
@@ -97,11 +89,9 @@ const CategoryAdminPanel = () => {
     } else {
       reset();
       setImagePreview('');
->>>>>>> 35db7a5d9a51e002f121b2a02717464c47f87411
     }
   }, [selectedCategory]);
 
-<<<<<<< HEAD
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     setFormData((prev) => ({
@@ -120,7 +110,6 @@ const CategoryAdminPanel = () => {
 
     if (selectedCategory) {
       updateCategoryMutation.mutate({ id: selectedCategory.id, data });
-=======
   // Handle mutation feedback
   useEffect(() => {
     if (addCategoryMutation.isSuccess) {
@@ -179,7 +168,6 @@ const CategoryAdminPanel = () => {
 
     if (selectedCategory) {
       updateCategoryMutation.mutate({ _id: selectedCategory._id, data: formData });
->>>>>>> 35db7a5d9a51e002f121b2a02717464c47f87411
     } else {
       addCategoryMutation.mutate(data);
     }
@@ -200,7 +188,6 @@ const CategoryAdminPanel = () => {
 
   return (
     <Layout>
-<<<<<<< HEAD
       <div className="max-w-6xl mx-auto px-4 py-10">
         <h1 className="text-3xl font-bold mb-6 text-center">Category Admin Panel</h1>
 
@@ -219,7 +206,6 @@ const CategoryAdminPanel = () => {
               required
               className="w-full p-2 border border-gray-300 rounded"
             />
-=======
       <div className="min-h-screen bg-gradient-to-br from-teal-50 via-gray-50 to-emerald-50 font-sans">
         {/* Toast Notification */}
         <AnimatePresence>
@@ -266,10 +252,8 @@ const CategoryAdminPanel = () => {
               <Plus className="h-5 w-5" />
               Add Category
             </button>
->>>>>>> 35db7a5d9a51e002f121b2a02717464c47f87411
           </div>
 
-<<<<<<< HEAD
           <div>
             <label className="block font-semibold">Description</label>
             <textarea
@@ -335,7 +319,6 @@ const CategoryAdminPanel = () => {
             </ul>
           )}
         </div>
-=======
         {/* Main Content */}
         <main className="max-w-7xl mx-auto px-6 py-12">
           {isLoading && (
@@ -624,7 +607,6 @@ const CategoryAdminPanel = () => {
             </motion.div>
           </div>
         )}
->>>>>>> 35db7a5d9a51e002f121b2a02717464c47f87411
       </div>
     </Layout>
   );
