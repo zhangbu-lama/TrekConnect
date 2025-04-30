@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axiosInstance from '../api/Index';
-import { fetchPlaces } from '../api/Place'; // Assuming you have this in a separate file
+import { fetchPlaces } from '../api/Place';
 
 const AddTrek = () => {
   const queryClient = useQueryClient();
-  
+
   // Initial form state based on trekSchema
   const [formData, setFormData] = useState({
     name: '',
@@ -19,9 +19,10 @@ const AddTrek = () => {
     contact_email: '',
     rating: '',
     reviews: '',
-    images: '',
   });
 
+  // State for storing selected image files (up to 4)
+  const [imageFiles, setImageFiles] = useState([]);
   const [errors, setErrors] = useState({});
 
   // Fetch places for the dropdown
@@ -32,7 +33,9 @@ const AddTrek = () => {
 
   // Mutation for adding a trek
   const addTrekMutation = useMutation({
-    mutationFn: (data) => axiosInstance.post('/treks/add', data),
+    mutationFn: (formData) => axiosInstance.post('/treks/add', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['details'] });
       setFormData({
@@ -47,8 +50,8 @@ const AddTrek = () => {
         contact_email: '',
         rating: '',
         reviews: '',
-        images: '',
       });
+      setImageFiles([]);
       alert('Trek added successfully!');
     },
     onError: (error) => {
@@ -72,6 +75,9 @@ const AddTrek = () => {
     if (formData.contact_number && !/^\d+$/.test(formData.contact_number)) {
       newErrors.contact_number = 'Contact number must be numeric';
     }
+    if (imageFiles.length > 4) {
+      newErrors.images = 'You can upload a maximum of 4 images';
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -81,18 +87,29 @@ const AddTrek = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    const data = {
-      ...formData,
-      images: formData.images ? formData.images.split(',').map(img => img.trim()) : [],
-      rating: formData.rating ? parseFloat(formData.rating) : undefined,
-      reviews: formData.reviews ? parseInt(formData.reviews) : undefined,
-      contact_number: formData.contact_number ? parseInt(formData.contact_number) : undefined,
-    };
+    // Create FormData object to send both text fields and files
+    const data = new FormData();
+    Object.keys(formData).forEach((key) => {
+      if (formData[key]) {
+        if (key === 'rating') {
+          data.append(key, parseFloat(formData[key]));
+        } else if (key === 'reviews' || key === 'contact_number') {
+          data.append(key, parseInt(formData[key]));
+        } else {
+          data.append(key, formData[key]);
+        }
+      }
+    });
+
+    // Append image files to FormData
+    imageFiles.forEach((file, index) => {
+      data.append('images', file);
+    });
 
     addTrekMutation.mutate(data);
   };
 
-  // Handle input changes
+  // Handle input changes for text fields
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (errors[e.target.name]) {
@@ -100,11 +117,27 @@ const AddTrek = () => {
     }
   };
 
+  // Handle image file selection
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length + imageFiles.length > 4) {
+      setErrors({ ...errors, images: 'You can upload a maximum of 4 images' });
+      return;
+    }
+    setImageFiles([...imageFiles, ...files]);
+    setErrors({ ...errors, images: '' });
+  };
+
+  // Remove an image from the selected files
+  const removeImage = (index) => {
+    setImageFiles(imageFiles.filter((_, i) => i !== index));
+  };
+
   return (
     <div className="container mx-auto p-6">
       <h2 className="text-3xl font-bold mb-6 text-gray-800">Add New Trek</h2>
       <div className="bg-white shadow-md rounded-lg p-6 max-w-3xl mx-auto">
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6" encType="multipart/form-data">
           <div>
             <label className="block text-sm font-medium text-gray-700">Trek Name</label>
             <input
@@ -257,34 +290,55 @@ const AddTrek = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Images (comma-separated URLs)</label>
+            <label className="block text-sm font-medium text-gray-700">Images (Upload up to 4 images)</label>
             <input
-              type="text"
+              type="file"
               name="images"
-              value={formData.images}
-              onChange={handleChange}
+              accept="image/*"
+              multiple
+              onChange={handleImageChange}
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              placeholder="e.g., http://example.com/image1.jpg,http://example.com/image2.jpg"
             />
+            {errors.images && <p className="mt-1 text-sm text-red-500">{errors.images}</p>}
+            <div className="mt-2 flex flex-wrap gap-2">
+              {imageFiles.map((file, index) => (
+                <div key={index} className="relative">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={`preview-${index}`}
+                    className="h-20 w-20 object-cover rounded"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center"
+                  >
+                    &times;
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="flex justify-end space-x-4">
             <button
               type="button"
-              onClick={() => setFormData({
-                name: '',
-                difficulty: '',
-                place: '',
-                duration: '',
-                overview: '',
-                max_elevation: '',
-                best_season: '',
-                contact_number: '',
-                contact_email: '',
-                rating: '',
-                reviews: '',
-                images: '',
-              })}
+              onClick={() => {
+                setFormData({
+                  name: '',
+                  difficulty: '',
+                  place: '',
+                  duration: '',
+                  overview: '',
+                  max_elevation: '',
+                  best_season: '',
+                  contact_number: '',
+                  contact_email: '',
+                  rating: '',
+                  reviews: '',
+                });
+                setImageFiles([]);
+              }}
               className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
             >
               Clear
