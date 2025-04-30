@@ -9,7 +9,7 @@ export const app = express();
 
 const corsOption = {
     credentials: true,
-    origin: process.env.CLIENT_URL,
+    origin: "http://localhost:5173"
 };
 
 app.use(cors(corsOption));
