@@ -39,7 +39,7 @@
         title: category.name,
         description: category.description,
         image: category.image,
-        path: `/places?category=${category.id}`,
+        path: `/places?category=${category.name}`,
       });
     });
 

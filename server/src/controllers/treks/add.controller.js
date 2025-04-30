@@ -63,7 +63,7 @@ export const addTrek = asyncHandler(async (req, res) => {
         throw new ErrorResponse(400, 6011, "atleast oen image is requried");
     }
 
-    const trek = new Trek({
+    const trek = await Trek.create({
         name,
         difficulty,
         place,

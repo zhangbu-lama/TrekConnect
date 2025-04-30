@@ -22,5 +22,5 @@ export const getTreksByPlaceId = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new SuccessResponse(200, "trek fetch by place sucessful", null));
+        .json(new SuccessResponse(200, "trek fetch by place sucessful", trek));
 });
