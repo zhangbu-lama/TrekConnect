@@ -1,3 +1,4 @@
+// Sidebar.jsx
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -39,6 +40,7 @@ const linkVariants = {
   },
 };
 
+// Individual Sidebar Link Component
 const SidebarLink = ({ to, icon: Icon, label }) => {
   const linkStyle = ({ isActive }) =>
     `flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 group ${
@@ -48,10 +50,7 @@ const SidebarLink = ({ to, icon: Icon, label }) => {
     }`;
 
   return (
-    <motion.div
-      whileHover="hover"
-      variants={linkVariants}
-    >
+    <motion.div whileHover="hover" variants={linkVariants}>
       <NavLink to={to} className={linkStyle}>
         <Icon className="h-5 w-5 group-hover:text-teal-600 transition duration-200" />
         {label}
@@ -60,6 +59,7 @@ const SidebarLink = ({ to, icon: Icon, label }) => {
   );
 };
 
+// Main Sidebar Component
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -107,13 +107,13 @@ const Sidebar = () => {
           <div className="text-xl font-bold text-teal-600">TravelNepal</div>
         </div>
 
-        {/* Navigation */}
+        {/* Navigation Links */}
         <nav className="flex flex-col space-y-2">
           <SidebarLink to="/dashboard" icon={LayoutDashboard} label="Dashboard" />
           <SidebarLink to="/add-category" icon={FolderPlus} label="Add Category" />
           <SidebarLink to="/page" icon={MapPin} label="Add Place" />
           <SidebarLink to="/add-details" icon={FileText} label="Add Details" />
-          <SidebarLink to="/show-bookings" icon={BookOpen} label="Show Bookings" />
+          <SidebarLink to="/show-bookings" icon={BookOpen} label="Show Trail Booking" />
           <SidebarLink to="/addlocation" icon={Map} label="Add Location" />
           <motion.div whileHover={{ scale: 1.03 }} className="my-2">
             <NavLink
@@ -127,7 +127,7 @@ const Sidebar = () => {
           <SidebarLink to="/productbooking" icon={ShoppingCart} label="Show Product Bookings" />
         </nav>
 
-        {/* User Profile */}
+        {/* User Profile Section */}
         <div className="mt-auto">
           <div className="flex items-center gap-3 p-3 bg-gray-100/50 rounded-lg">
             <div className="h-10 w-10 rounded-full bg-green-500 flex items-center justify-center text-white font-semibold">

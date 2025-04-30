@@ -144,7 +144,7 @@ const AdminPanel = () => {
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             <div className="flex items-center gap-6">
 
-            <h1 className="text-4xl font-extrabold text-gray-500 tracking-tight">
+            <h1 className="text-4xl font-extrabold text-gray-400 tracking-tight">
             Product Management Dashboard
               </h1>
             </div>
@@ -157,7 +157,7 @@ const AdminPanel = () => {
               }}
               className="bg-white text-emerald-600 font-semibold py-3 px-6 rounded-full flex items-center gap-2 hover:bg-emerald-50 hover:text-emerald-700 transition-all duration-200 shadow-md"
             >
-              <Plus className="h-5 w-5" />
+              <Plus className="h-5 w-5 text-gray-400" />
               Add New Product
             </button>
           </div>
