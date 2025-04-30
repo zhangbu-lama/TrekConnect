@@ -40,6 +40,7 @@ const AdminPlaces = () => {
     queryFn: fetchPlaces,
   });
   const { data: categories = [], isLoading: categoriesLoading, error: categoriesError } = useCategories();
+    console.log(categories)
 
   const { register, handleSubmit, reset, setValue, control, formState: { errors } } = useForm({
     defaultValues: {
