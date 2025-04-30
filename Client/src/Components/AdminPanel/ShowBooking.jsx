@@ -49,9 +49,8 @@ const AdminPanel = () => {
                 className="flex items-center gap-2 text-white hover:text-emerald-200 transition-colors duration-200"
               >
                 <ArrowLeft className="h-6 w-6" />
-                <span className="text-lg font-medium">Back to Dashboard</span>
               </Link>
-              <h1 className="text-4xl font-extrabold text-white tracking-tight">
+              <h1 className="text-4xl font-extrabold text-gray-400 tracking-tight">
                 Booking Management Dashboard
               </h1>
             </div>

@@ -3,10 +3,11 @@ import First from './Coverpage'
 import Second from './Activities'
 import Third from './Founders'
 import Footer from './Footer'
-
+import Navar from './Navbar'
 function Routing() {
   return (
     <div>
+      <Navar />
         <First />
         <Second />
         <Third />
