@@ -5,7 +5,8 @@
   import boulderImage from "../../assets/boulder.png";
   import riccardoImage from "../../assets/pexels-riccardo-303040.webp";
 
-  const BASE_URL = 'http://localhost:8000/api'; 
+  const BASE_URL = 'http://localhost:8000'; 
+
 
   const Activities = () => {
     const [categories, setCategories] = useState([]);
@@ -19,7 +20,7 @@
 
           const formattedData = data.map((category) => ({
             ...category,
-            image: category.image ? `${BASE_URL}${category.image}` : "https://source.unsplash.com/800x600/?nature",
+            image: category.image ? `${BASE_URL}/uploads/${category.image}` : "https://source.unsplash.com/800x600/?nature",
           }));
 
           setCategories(formattedData);
@@ -42,12 +43,6 @@
       });
     });
 
-    dynamicActivities.push({
-      title: "Bouldering",
-      image: boulderImage,
-      description: "Experience the thrill of climbing without ropes on challenging boulders!",
-      path: "/bouldering",
-    });
 
     const handleCarouselTransition = (direction) => {
       const newIndex = (activeIndex + direction + dynamicActivities.length) % dynamicActivities.length;

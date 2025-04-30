@@ -14,37 +14,38 @@ export const updatePlace = asyncHandler(async (req, res) => {
     const relatedName = req.body?.related_name;
     const image = req.file;
     const timeToTravel = req.body?.time_to_travel;
-    const isImageUpdated = req.body?.is_image_updated ?? false;
 
-    // Validate required fields
-    if (
-        !name ||
-        !location ||
-        !description ||
-        !category ||
-        !relatedName ||
-        !image ||
-        !timeToTravel
-    ) {
+    if (!name) {
         return res
             .status(400)
-            .json(new ErrorResponse(400, 6000, "All fields are required"));
+            .json(new ErrorResponse(400, 6000, "Name is required"));
     }
-    // Validate image type
-    const allowedImageTypes = ["image/jpeg", "image/png", "image/jpg"];
-    if (!allowedImageTypes.includes(image.mimetype)) {
+
+    if (!location) {
         return res
             .status(400)
-            .json(new ErrorResponse(400, 6001, "Invalid image type"));
+            .json(new ErrorResponse(400, 6001, "Location is required"));
     }
-    // Validate image size (5MB limit)
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (image.size > maxSize) {
+    if (!description) {
         return res
             .status(400)
-            .json(new ErrorResponse(400, 6002, "Image size exceeds 5MB limit"));
+            .json(new ErrorResponse(400, 6002, "Description is required"));
     }
-    // Check if the place exists
+    if (!category) {
+        return res
+            .status(400)
+            .json(new ErrorResponse(400, 6003, "Category is required"));
+    }
+    if (!relatedName) {
+        return res
+            .status(400)
+            .json(new ErrorResponse(400, 6004, "Related name is required"));
+    }
+    if (!timeToTravel) {
+        return res
+            .status(400)
+            .json(new ErrorResponse(400, 6005, "Time to travel is required"));
+    }
 
     if (!isValidObjectId(id)) {
         return res
@@ -67,9 +68,7 @@ export const updatePlace = asyncHandler(async (req, res) => {
     place.category = category;
     place.related_name = relatedName;
     place.time_to_travel = timeToTravel;
-    if (isImageUpdated) {
-        place.image = image.path;
-    }
+    place.image = image ? image.filename : place.image;
     await place.save();
 
     return res

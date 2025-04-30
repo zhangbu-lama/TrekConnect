@@ -5,7 +5,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, MapPin, Clock, Mountain, Mail, Facebook, Instagram, Twitter, Menu, X, Compass } from 'lucide-react';
 
-const IMAGE_BASE_URL = 'http://localhost:8000/api';
+const IMAGE_BASE_URL = 'http://localhost:8000';
 
 const TrekkingPage = () => {
   const { data: places = [], isLoading, isError } = usePlaces();
@@ -113,14 +113,11 @@ const TrekkingPage = () => {
                     <div className="relative h-56 overflow-hidden">
                       {place.image ? (
                         <img
-                          src={`${IMAGE_BASE_URL}${place.image}`}
+                          src={`${IMAGE_BASE_URL}/uploads/${place.image}`}
                           alt={place.name}
                           className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                           loading="lazy"
-                          onError={(e) => {
-                            e.target.src = '/fallback-image.jpg';
-                          }}
-                        />
+                                                 />
                       ) : (
                         <div className="h-full bg-gray-200 flex items-center justify-center">
                           <p className="text-gray-500">No image available</p>
