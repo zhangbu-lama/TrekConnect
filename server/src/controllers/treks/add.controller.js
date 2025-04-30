@@ -1,21 +1,25 @@
 import { isValidObjectId } from "mongoose";
-import { asyncHandler, SuccessResponse } from "../../lib/index.js";
+import {
+    asyncHandler,
+    SuccessResponse,
+    ErrorResponse,
+} from "../../lib/index.js";
 import { Trek } from "../../models/index.js";
 
 export const addTrek = asyncHandler(async (req, res) => {
-    const name = (req.body?.name ?? "").tirm();
+    const name = (req.body?.name ?? "").trim();
 
-    const difficulty = (req.body?.difficulty ?? "").tirm();
-    const place = (req.body?.place ?? "").tirm();
-    const duration = (req.body?.duration ?? "").tirm();
-    const overview = (req.body?.overview ?? "").tirm();
-    const max_elevation = (req.body?.max_elevation ?? "").tirm();
-    const best_season = (req.body?.best_season ?? "").tirm();
-    const contact_number = (req.body?.contact_number ?? "").tirm();
-    const contact_email = (req.body?.contact_email ?? "").tirm();
-    const rating = (req.body?.rating ?? "").tirm();
-    const reviews = (req.body?.reviews ?? "").tirm();
-    const images = (req.body?.images ?? "").tirm();
+    const difficulty = req.body?.difficulty ?? "";
+    const place = (req.body?.place ?? "").trim();
+    const duration = req.body?.duration ?? "";
+    const overview = (req.body?.overview ?? "").trim();
+    const max_elevation = req.body?.max_elevation ?? "";
+    const best_season = (req.body?.best_season ?? "").trim();
+    const contact_number = req.body?.contact_number ?? "";
+    const contact_email = req.body?.contact_email ?? "";
+    const rating = (req.body?.rating ?? "").trim();
+    const reviews = (req.body?.reviews ?? "").trim();
+    const images = req.files;
 
     if (!name) {
         throw new ErrorResponse(400, 6000, "name is required");
