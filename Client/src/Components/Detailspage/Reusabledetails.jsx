@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Clock, MapPin, Mountain, Star, Thermometer, Phone, Mail } from "lucide-react";
-import { useDetailById } from "../Hooks/useDetails";
+import { useDetailsByPlace } from "../Hooks/useDetails";
 
 const BASE_URL = "http://127.0.0.1:8000";
 
@@ -34,7 +34,7 @@ const HighlightImage = ({ image, alt }) => (
 
 const DetailsPage = () => {
   const { id } = useParams();
-  const { data: trek, isLoading, error } = useDetailById(id);
+  const { data: trek, isLoading, error } = useDetailsByPlace(id);
   const [activeTab, setActiveTab] = useState("overview");
 
   if (isLoading) {
