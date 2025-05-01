@@ -17,4 +17,4 @@ treksRouter.get("/:id", getTrekById);
 treksRouter.get("/place/:id", getTreksByPlaceId);
 treksRouter.post("/add", upload.array("images"), addTrek);
 treksRouter.delete("/delete/:id", deleteTrek);
-treksRouter.patch("/udpate/:id", updateTrek);
+treksRouter.patch("/udpate/:id",upload.array("images"), updateTrek);
