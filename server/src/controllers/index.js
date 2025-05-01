@@ -1,3 +1,4 @@
+import { userLogin } from "./auth/login.controller.js";
 import { signup } from "./auth/signup.controller.js";
 
 import { addCategory } from "./categories/add.controller.js";
@@ -21,6 +22,7 @@ import { updateTrek } from "./treks/update.controller.js";
 
 export {
     signup,
+    userLogin,
     addTrek,
     getAllTreks,
     getTrekById,
