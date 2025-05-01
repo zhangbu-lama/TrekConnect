@@ -20,7 +20,7 @@ export const adminLogin = asyncHandler(async (req, res) => {
     }
 
     return res.status(200).json(
-        new SuccessResponse("Admin Login successful", {
+        new SuccessResponse(200,"Admin Login successful", {
             token: process.env.ADMIN_TOKEN,
         }),
     );

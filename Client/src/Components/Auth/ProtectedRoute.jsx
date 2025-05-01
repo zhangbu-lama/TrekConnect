@@ -1,19 +1,20 @@
-import { Navigate } from 'react-router-dom';
-import useAuthStore from '../Store/AuthStore';
-import React from 'react';
+import { Navigate } from "react-router-dom";
+import useAuthStore from "../Store/AuthStore";
+import React from "react";
 
-const ProtectedRoute = ({ children, isAdmin = false }) => {
-  const { user, adminToken } = useAuthStore();
+const ProtectedRoute = ({ children }) => {
+    const { user, adminToken } = useAuthStore();
 
-  if (isAdmin && !adminToken) {
-    return <Navigate to="/admin-login" replace />;
-  }
+    if (!user) {
+        return <Navigate to="/userlogin" replace />;
+    }
 
-  if (!isAdmin && !user) {
-    return <Navigate to="/login" replace />;
-  }
+    if (!adminToken && !user) {
+        return <Navigate to="/admin/login" replace />;
+    }
 
-  return children;
+
+    return children;
 };
 
 export default ProtectedRoute;
