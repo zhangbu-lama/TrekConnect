@@ -1,68 +1,63 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Footer from '../HomePage/Footer';
+import Navbar from '../HomePage/Navbar';
 
 function LoginPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-slate-900 bg-opacity-90 p-10 rounded-2xl shadow-2xl border border-slate-700">
-        {/* Header */}
-        <div className="text-center">
-          <h2 className="text-4xl font-extrabold text-white font-archivo tracking-wide">
-            Welcome Back
-          </h2>
-          <p className="mt-2 text-sm text-gray-400">
-            Sign in to continue your adventure
-          </p>
-        </div>
-
-        {/* Form */}
-        <form className="mt-8 space-y-6">
-          <div className="space-y-4">
-            <InputField id="email" label="Email Address" type="email" placeholder="Enter your email" />
-            <InputField id="password" label="Password" type="password" placeholder="Enter your password" />
+    <>
+    <Navbar />
+      <div className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-2xl border border-gray-200">
+          {/* Header */}
+          <div className="text-center">
+            <h2 className="text-4xl font-extrabold text-gray-900 font-archivo tracking-wide">
+              Welcome Back
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Sign in to continue your adventure
+            </p>
           </div>
 
-          {/* Submit Button */}
-          <div>
-            <button
-              type="submit"
-              className="w-full flex justify-center py-2 px-4 rounded-xl text-white font-medium bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 transition"
-            >
-              Sign In
-            </button>
+          {/* Form */}
+          <form className="mt-8 space-y-6">
+            <div className="space-y-4">
+              <InputField id="email" label="Email Address" type="email" placeholder="Enter your email" />
+              <InputField id="password" label="Password" type="password" placeholder="Enter your password" />
+            </div>
+
+            {/* Submit Button */}
+            <div>
+              <button
+                type="submit"
+                className="w-full flex justify-center py-2 px-4 rounded-xl text-white font-medium bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 transition"
+              >
+                Sign In
+              </button>
+            </div>
+          </form>
+
+          {/* Divider */}
+          <div className="flex items-center gap-4 mt-6">
+            <div className="flex-1 h-px bg-gray-300" />
+            <p className="text-sm text-gray-500">or continue with</p>
+            <div className="flex-1 h-px bg-gray-300" />
           </div>
-        </form>
 
-        {/* Register Link */}
-        <div className="text-center">
-          <p className="text-sm text-gray-400">
-            Don't have an account?{' '}
-            <Link to="/admin/register" className="text-indigo-400 hover:underline">
-              Sign Up
-            </Link>
-          </p>
-        </div>
-
-        {/* Divider */}
-        <div className="flex items-center gap-4 mt-6">
-          <div className="flex-1 h-px bg-gray-600" />
-          <p className="text-sm text-gray-400">or continue with</p>
-          <div className="flex-1 h-px bg-gray-600" />
-        </div>
-
-        {/* Social Buttons */}
-        <div className="flex gap-4 justify-center mt-2">
-          <SocialButton provider="Google" />
-          <SocialButton provider="GitHub" />
+          {/* Social Buttons */}
+          <div className="flex gap-4 justify-center mt-2">
+            <SocialButton provider="Google" />
+            <SocialButton provider="GitHub" />
+          </div>
         </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 }
 
 const InputField = ({ id, label, type, placeholder }) => (
   <div>
-    <label htmlFor={id} className="block text-sm font-medium text-gray-300">
+    <label htmlFor={id} className="block text-sm font-medium text-gray-700">
       {label}
     </label>
     <input
@@ -71,7 +66,7 @@ const InputField = ({ id, label, type, placeholder }) => (
       type={type}
       required
       placeholder={placeholder}
-      className="mt-1 block w-full rounded-md px-3 py-2 bg-slate-800 border border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+      className="mt-1 block w-full rounded-md px-3 py-2 bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
     />
   </div>
 );
@@ -79,14 +74,15 @@ const InputField = ({ id, label, type, placeholder }) => (
 const SocialButton = ({ provider }) => {
   const logos = {
     Google: 'https://www.svgrepo.com/show/475656/google-color.svg',
-    GitHub: 'https://www.svgrepo.com/show/512317/github-142.svg'
+    GitHub: 'https://www.svgrepo.com/show/512317/github-142.svg',
   };
   return (
-    <button className="flex items-center gap-2 px-4 py-2 rounded-md bg-slate-800 border border-gray-600 hover:bg-slate-700 transition text-white text-sm font-medium">
+    <button className="flex items-center gap-2 px-4 py-2 rounded-md bg-white border border-gray-300 hover:bg-gray-100 transition text-gray-900 text-sm font-medium">
       <img src={logos[provider]} alt={provider} className="h-5 w-5" />
       {provider}
     </button>
   );
+
 };
 
 export default LoginPage;
