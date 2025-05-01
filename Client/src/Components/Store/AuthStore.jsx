@@ -27,7 +27,7 @@ const useAuthStore = create((set) => ({
         withCredentials: true,
       });
       set({ loading: false, user: response.data.data });
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to log in';
       set({ loading: false, error: errorMessage });
@@ -40,7 +40,7 @@ const useAuthStore = create((set) => ({
     try {
       const response = await axios.post('http://localhost:8000/api/v1/auth/admin/login', credentials);
       set({ loading: false, adminToken: response.data.data.token });
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Admin login error details:', error); // Detailed debug log
       let errorMessage = 'Failed to log in as admin';

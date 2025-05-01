@@ -15,6 +15,7 @@ export const generateAccessToken = async (userId) => {
     }
     const token = jwt.sign(
         {
+            _id: user._id,
             first_name: user.first_name,
             last_name: user.last_name,
             email_address: user.email_address,
@@ -39,6 +40,7 @@ export const generateRefreshToken = async (userId) => {
     }
     const token = jwt.sign(
         {
+            _id: user._id,
             first_name: user.first_name,
             last_name: user.last_name,
             email_address: user.email_address,
