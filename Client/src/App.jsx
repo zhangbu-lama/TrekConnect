@@ -165,8 +165,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Routing />} />
-        <Route path="/places" element={<Reusable />} />
-        <Route path="/reusabledetails/:id" element={<Reusabledetails />} />
+        <Route path="/trek" element={<Reusable />} />
+        <Route path="/details/:id" element={<Reusabledetails />} />
         <Route path="/bookingform" element={<BookingFormPage />} />
         <Route path="/bouldering" element={<Bouldering />} />
         <Route path="/bookproduct" element={<ProductBooking />} />

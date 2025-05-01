@@ -1,26 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { usePlaces } from '../Hooks/usePlace';
 import usePlaceStore from '../Store/placeStore';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, MapPin, Clock, Mountain, Mail, Facebook, Instagram, Twitter, Menu, X, Compass } from 'lucide-react';
+import { MapPin, Clock, Mountain, Mail, Facebook, Instagram, Twitter } from 'lucide-react';
 
 const IMAGE_BASE_URL = 'http://localhost:8000';
 
 const TrekkingPage = () => {
   const { data: places = [], isLoading, isError } = usePlaces();
-  const { filter, selectedCategory, setSelectedCategory } = usePlaceStore();
-  const [searchParams] = useSearchParams();
-
-  // Set category from URL
-  useEffect(() => {
-    const categoryId = searchParams.get('category');
-    if (typeof setSelectedCategory !== 'function') {
-      console.error('setSelectedCategory is not a function.');
-      return;
-    }
-    setSelectedCategory(categoryId || null);
-  }, [searchParams, setSelectedCategory]);
+  const { filter, selectedCategory } = usePlaceStore();
 
   // Filter places based on search and category
   const filteredPlaces = places.filter((place) => {
@@ -48,8 +37,6 @@ const TrekkingPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
-  
-
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <motion.section
@@ -113,11 +100,11 @@ const TrekkingPage = () => {
                     <div className="relative h-56 overflow-hidden">
                       {place.image ? (
                         <img
-                          src={`${IMAGE_BASE_URL}/uploads/${place.image}`}
+                          src={`${IMAGE_BASE_URL}/Uploads/${place.image}`}
                           alt={place.name}
                           className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                           loading="lazy"
-                                                 />
+                        />
                       ) : (
                         <div className="h-full bg-gray-200 flex items-center justify-center">
                           <p className="text-gray-500">No image available</p>
@@ -143,7 +130,7 @@ const TrekkingPage = () => {
                     </div>
                     <div className="px-6 pb-6">
                       <Link
-                        to={`/reusabledetails/${place._id}`}
+                        to={`/details/${place._id}`}
                         className="block w-full text-center bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-medium transition-colors"
                       >
                         Explore Trail

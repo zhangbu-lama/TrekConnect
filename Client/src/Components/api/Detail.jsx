@@ -7,8 +7,8 @@ export const fetchDetails = async () => {
 };
 
 // Fetch detail by ID
-export const fetchDetailById = async (id) => {
-  const response = await axiosInstance.get(`/treks/${id}`);
+export const fetchDetailById = async (_id) => {
+  const response = await axiosInstance.get(`/treks/${_id}`);
   return response.data.data;
 };
 
