@@ -9,7 +9,7 @@ const Navbar = () => {
 
   const navItems = [
     { name: 'Home', path: '/' },
-    { name: 'User Dashboard', path: '/user-dashboard' },
+    { name: 'User Dashboard', path: '/user' },
     { name: 'Admin Dashboard', path: '/admin' },
     { name: 'Bouldering', path: '/bouldering' },
   ];
