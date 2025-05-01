@@ -1,94 +1,110 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useAuthStore from '../Store/AuthStore';
 import React from 'react';
-import { Link } from 'react-router-dom';
+const Signup = () => {
+  const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
+    email_address: '',
+    password: '',
+  });
+  const { signup, loading, error } = useAuthStore();
+  const navigate = useNavigate();
 
-function RegisterPage() {
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await signup(formData);
+      navigate('/userlogin');
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-slate-900 bg-opacity-90 p-10 rounded-2xl shadow-2xl border border-slate-700">
-        {/* Header */}
-        <div className="text-center">
-          <h2 className="text-4xl font-extrabold text-white font-archivo tracking-wide">
-            Join the Adventure
-          </h2>
-          <p className="mt-2 text-sm text-gray-400">
-            Create an account to start exploring
-          </p>
-        </div>
-
-        {/* Form */}
-        <form className="mt-8 space-y-6">
-          <div className="space-y-4">
-            <InputField id="name" label="Full Name" type="text" placeholder="Enter your full name" />
-            <InputField id="email" label="Email address" type="email" placeholder="Enter your email" />
-            <InputField id="password" label="Password" type="password" placeholder="Enter your password" />
-            <InputField id="confirm-password" label="Confirm Password" type="password" placeholder="Confirm your password" />
-          </div>
-
-          {/* Submit Button */}
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Sign Up</h2>
+        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <button
-              type="submit"
-              className="w-full flex justify-center py-2 px-4 rounded-xl text-white font-medium bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 transition"
-            >
-              Sign Up
-            </button>
+            <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">
+              First Name
+            </label>
+            <input
+              type="text"
+              name="first_name"
+              id="first_name"
+              value={formData.first_name}
+              onChange={handleChange}
+              required
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
           </div>
+          <div>
+            <label htmlFor="last_name" className="block text-sm font-medium text-gray-700">
+              Last Name
+            </label>
+            <input
+              type="text"
+              name="last_name"
+              id="last_name"
+              value={formData.last_name}
+              onChange={handleChange}
+              required
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          <div>
+            <label htmlFor="email_address" className="block text-sm font-medium text-gray-700">
+              Email Address
+            </label>
+            <input
+              type="email"
+              name="email_address"
+              id="email_address"
+              value={formData.email_address}
+              onChange={handleChange}
+              required
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+          >
+            {loading ? 'Signing Up...' : 'Sign Up'}
+          </button>
         </form>
-
-        {/* Login Link */}
-        <div className="text-center">
-          <p className="text-sm text-gray-400">
-            Already have an account?{' '}
-            <Link to="/admin/login" className="text-indigo-400 hover:underline">
-              Sign In
-            </Link>
-          </p>
-        </div>
-
-        {/* Divider */}
-        <div className="flex items-center gap-4">
-          <div className="flex-1 h-px bg-gray-600" />
-          <p className="text-sm text-gray-400">or continue with</p>
-          <div className="flex-1 h-px bg-gray-600" />
-        </div>
-
-        {/* Social Buttons */}
-        <div className="flex gap-4 justify-center mt-2">
-          <SocialButton provider="Google" />
-          <SocialButton provider="GitHub" />
-        </div>
+        <p className="mt-4 text-center text-sm text-gray-600">
+          Already have an account?{' '}
+          <a href="/userlogin" className="text-indigo-600 hover:underline">
+            Log in
+          </a>
+        </p>  
       </div>
     </div>
   );
-}
-
-const InputField = ({ id, label, type, placeholder }) => (
-  <div>
-    <label htmlFor={id} className="block text-sm font-medium text-gray-300">
-      {label}
-    </label>
-    <input
-      id={id}
-      name={id}
-      type={type}
-      required
-      placeholder={placeholder}
-      className="mt-1 block w-full rounded-md px-3 py-2 bg-slate-800 border border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-    />
-  </div>
-);
-
-const SocialButton = ({ provider }) => {
-  const logos = {
-    Google: 'https://www.svgrepo.com/show/475656/google-color.svg',
-    GitHub: 'https://www.svgrepo.com/show/512317/github-142.svg'
-  };
-  return (
-    <button className="flex items-center gap-2 px-4 py-2 rounded-md bg-slate-800 border border-gray-600 hover:bg-slate-700 transition text-white text-sm font-medium">
-      <img src={logos[provider]} alt={provider} className="h-5 w-5" />
-      {provider}
-    </button>
-  );
 };
 
-export default RegisterPage;
+export default Signup;
