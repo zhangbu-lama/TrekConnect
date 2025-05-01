@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { registerUser, loginUser, logoutUser } from '../api/Auth';
 import useAuthStore from '../Store/AuthStore';
-
+import React from 'react';
 export const useRegister = () => {
   return useMutation({
     mutationFn: registerUser,
@@ -12,13 +12,28 @@ export const useRegister = () => {
 
 export const useLogin = () => {
   const setUser = useAuthStore((state) => state.setUser);
+
   return useMutation({
-    mutationFn: loginUser,
-    onSuccess: (data, variables) => {
-      console.log('Login successful:', data);
-      setUser({ email: variables.email });
+    mutationFn: async (data) => {
+      const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
+      const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
+
+      // Check if it's admin login
+      if (data.email === adminEmail && data.password === adminPassword) {
+        return { user: { email: data.email }, role: 'admin' };
+      }
+
+      // Otherwise, normal user login
+      const response = await loginUser(data); // API call
+      return { user: response.user, role: 'user' };
     },
-    onError: (error) => console.error('Error logging in:', error.response?.data?.error || error.message),
+    onSuccess: (result) => {
+      console.log('Login successful:', result);
+      setUser(result.user, result.role);
+    },
+    onError: (error) => {
+      console.error('Error logging in:', error.response?.data?.error || error.message);
+    },
   });
 };
 
