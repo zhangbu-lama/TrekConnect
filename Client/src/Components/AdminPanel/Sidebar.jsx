@@ -1,7 +1,7 @@
-// Sidebar.jsx
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import {
   LayoutDashboard,
   FolderPlus,
@@ -15,7 +15,6 @@ import {
   X,
 } from 'lucide-react';
 
-// Animation Variants
 const sidebarVariants = {
   hidden: { opacity: 0, x: -50 },
   visible: {
@@ -40,32 +39,36 @@ const linkVariants = {
   },
 };
 
-// Individual Sidebar Link Component
 const SidebarLink = ({ to, icon: Icon, label }) => {
-  const linkStyle = ({ isActive }) =>
-    `flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 group ${
-      isActive
-        ? 'text-teal-600 font-semibold'
-        : 'text-gray-500 hover:text-teal-600'
-    }`;
-
   return (
     <motion.div whileHover="hover" variants={linkVariants}>
-      <NavLink to={to} className={linkStyle}>
-        <Icon className="h-5 w-5 group-hover:text-teal-600 transition duration-200" />
-        {label}
+      <NavLink
+        to={to}
+        className={({ isActive }) =>
+          `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+            isActive
+              ? 'bg-teal-500 text-white shadow-md'
+              : 'text-gray-600 hover:bg-teal-50 hover:text-teal-600'
+          }`
+        }
+        aria-label={label}
+      >
+        <Icon
+          className={`h-5 w-5 transition-colors duration-200 ${
+            ({ isActive }) => (isActive ? 'text-white' : 'text-gray-600')
+          }`}
+        />
+        <span>{label}</span>
       </NavLink>
     </motion.div>
   );
 };
 
-// Main Sidebar Component
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
-      {/* Mobile Toggle Button */}
       <button
         className="md:hidden fixed top-4 left-4 z-50 p-2 bg-teal-500 text-white rounded-full shadow-md hover:bg-teal-600 transition-all duration-300"
         onClick={() => setIsOpen(!isOpen)}
@@ -74,9 +77,8 @@ const Sidebar = () => {
         {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
 
-      {/* Sidebar */}
       <motion.aside
-        className={`w-64 bg-white/90 backdrop-blur-md border-r border-gray-100/50 text-gray-800 h-screen p-6 space-y-6 fixed top-0 left-0 shadow-lg z-40 transform ${
+        className={`w-64 bg-white/95 backdrop-blur-md border-r border-gray-100 text-gray-800 h-screen p-6 space-y-6 fixed top-0 left-0 shadow-lg z-40 transform ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } md:translate-x-0 transition-transform duration-300`}
         initial="hidden"
@@ -86,7 +88,6 @@ const Sidebar = () => {
         role="navigation"
         aria-label="Travel Admin Navigation"
       >
-        {/* Logo */}
         <div className="flex items-center gap-3 mb-8">
           <svg
             className="h-8 w-8 text-teal-500"
@@ -104,12 +105,13 @@ const Sidebar = () => {
             <path d="M12 2v4" />
             <path d="M12 18v4" />
           </svg>
-          <div className="text-xl font-bold text-teal-600">TravelNepal</div>
+          <Link 
+          to='/'>
+          <div className="text-xl font-bold text-teal-600">Travel</div>
+          </Link>
         </div>
 
-        {/* Navigation Links */}
-        <nav className="flex flex-col space-y-2">
-          <SidebarLink to="/dashboard" icon={LayoutDashboard} label="Dashboard" />
+        <nav className="flex flex-col space-y-1">
           <SidebarLink to="/add-category" icon={FolderPlus} label="Add Category" />
           <SidebarLink to="/page" icon={MapPin} label="Add Place" />
           <SidebarLink to="/add-details" icon={FileText} label="Add Details" />
@@ -118,28 +120,45 @@ const Sidebar = () => {
           <motion.div whileHover={{ scale: 1.03 }} className="my-2">
             <NavLink
               to="/addproduct"
-              className="flex items-center gap-3 px-4 py-2 bg-teal-500/10 text-teal-600 rounded-lg text-sm font-medium hover:bg-teal-500/20 transition-all duration-200"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  isActive
+                    ? 'bg-teal-500 text-white shadow-md'
+                    : 'bg-teal-500/10 text-teal-600 hover:bg-teal-500/20'
+                }`
+              }
+              aria-label="Add Product"
             >
               <PackagePlus className="h-5 w-5" />
-              Add Product
+              <span>Add Product</span>
             </NavLink>
           </motion.div>
           <SidebarLink to="/productbooking" icon={ShoppingCart} label="Show Product Bookings" />
         </nav>
 
-        {/* User Profile Section */}
         <div className="mt-auto">
-          <div className="flex items-center gap-3 p-3 bg-gray-100/50 rounded-lg">
-            <div className="h-10 w-10 rounded-full bg-green-500 flex items-center justify-center text-white font-semibold">
-              TS
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+            <div className="h-10 w-10 rounded-full bg-teal-500 flex items-center justify-center text-white font-semibold">
+              A
             </div>
             <div>
               <p className="text-sm font-medium text-gray-800">Admin</p>
-              <p className="text-xs text-gray-500">travelnepal</p>
+              <p className="text-xs text-gray-500">admin@gmail.com</p>
             </div>
           </div>
         </div>
       </motion.aside>
+
+      {isOpen && (
+        <motion.div
+          className="md:hidden fixed inset-0 bg-black/50 z-30"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setIsOpen(false)}
+          aria-hidden="true"
+        />
+      )}
     </>
   );
 };
