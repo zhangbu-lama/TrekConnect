@@ -7,7 +7,6 @@ import Navar from './Navbar'
 function Routing() {
   return (
     <div>
-      <Navar />
         <First />
         <Second />
         <Third />
