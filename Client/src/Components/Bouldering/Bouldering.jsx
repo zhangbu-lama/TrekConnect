@@ -6,7 +6,6 @@ import Navar from "../HomePage/Navbar";
 function Bouldering() {   
   return (
     <div>
-            <Navar />
 
         <MapComponent />
         <ProductPage />
