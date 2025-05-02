@@ -29,7 +29,7 @@ const useAuthStore = create((set) => ({
         withCredentials: true,
       });
       set({ loading: false, user: response.data.data });
-      return response.data;
+      return response.data.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to log in';
       set({ loading: false, error: errorMessage });
@@ -45,6 +45,8 @@ const useAuthStore = create((set) => ({
       localStorage.setItem('adminToken', token);
       set({ loading: false, adminToken: token });
       return response.data;
+      set({ loading: false, adminToken: response.data.data.token });
+      return response.data.data;
     } catch (error) {
       console.error('Admin login error:', error);
       let errorMessage = 'Failed to log in as admin';
