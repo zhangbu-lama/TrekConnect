@@ -3,6 +3,9 @@ import { userLogin } from "./auth/login.controller.js";
 import { logout } from "./auth/logout.controller.js";
 import { signup } from "./auth/signup.controller.js";
 import { verifyUserToken } from "./auth/verifyUserToken.controller.js";
+import { getBookingById } from "./booking/byId.controller.js";
+import { createBooking } from "./booking/create.controller.js";
+import { getAllBookings } from "./booking/getAll.controller.js";
 
 import { addCategory } from "./categories/add.controller.js";
 import { getAllCategories } from "./categories/all.controller.js";
@@ -45,4 +48,7 @@ export {
     verifyUserToken,
     verifyAdminToken,
     logout,
+    createBooking,
+    getAllBookings,
+    getBookingById,
 };
