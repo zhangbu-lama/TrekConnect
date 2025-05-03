@@ -15,6 +15,8 @@ export const createBooking = asyncHandler(async (req, res) => {
     const groupSize = (req.body?.group_size ?? "").trim();
     const destination = (req.body?.destination ?? "").trim();
     const specialRequirements = (req.body?.special_requirements ?? "").trim();
+    const creator = req.user?._id;
+
 
     if (!firstName) {
         throw new ErrorResponse(400, 6000, "First name is required");
@@ -42,6 +44,7 @@ export const createBooking = asyncHandler(async (req, res) => {
     }
 
     const booking = await Booking.create({
+        creator,
         first_name: firstName,
         last_name: lastName,
         email: email,

@@ -21,6 +21,11 @@ const bookingSchema = new mongoose.Schema(
         start_date: {
             type: String,
         },
+        creator: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
         travel_date: String,
         group_size: String,
         destination: String,
