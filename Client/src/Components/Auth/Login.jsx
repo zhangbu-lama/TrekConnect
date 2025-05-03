@@ -19,7 +19,7 @@ const AdminLogin = () => {
     console.log('Submitting admin login:', formData); // Debug log
     try {
       await adminLogin(formData);
-      console.log('Admin login successful, navigating to /admin-dashboard');
+      console.log('Admin login successful, navigating to /admin');
       navigate('/admin');
     } catch (err) {
       console.error('Admin login error:', err.message);

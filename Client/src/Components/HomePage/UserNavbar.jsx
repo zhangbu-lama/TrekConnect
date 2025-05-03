@@ -1,15 +1,23 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import useAuthStore from '../Store/AuthStore';
 
-const MainNavbar = () => {
+const UserNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { logout } = useAuthStore();
+  const navigate = useNavigate();
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+    setIsOpen(false);
+  };
+
   const navItems = [
-    { name: 'User Dashboard', path: '/userlogin' },
-    { name: 'Admin Dashboard', path: '/admin/login' },
+    { name: 'View Dashboard', path: '/user' },
     { name: 'Bouldering', path: '/bouldering' },
   ];
 
@@ -42,6 +50,14 @@ const MainNavbar = () => {
                 </NavLink>
               </li>
             ))}
+            <li>
+              <button
+                onClick={handleLogout}
+                className="text-base font-medium text-gray-800 hover:text-blue-600 hover:scale-105 transition-all duration-300"
+              >
+                Logout
+              </button>
+            </li>
           </ul>
 
           {/* Mobile Hamburger Icon */}
@@ -77,6 +93,14 @@ const MainNavbar = () => {
                 </NavLink>
               </li>
             ))}
+            <li>
+              <button
+                onClick={handleLogout}
+                className="block text-base font-semibold text-gray-800 hover:text-blue-600 hover:scale-105 transition-all duration-300"
+              >
+                Logout
+              </button>
+            </li>
           </ul>
         </div>
       </div>
@@ -84,4 +108,4 @@ const MainNavbar = () => {
   );
 };
 
-export default MainNavbar;
+export default UserNavbar;
