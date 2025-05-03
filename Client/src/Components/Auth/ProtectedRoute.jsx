@@ -3,9 +3,9 @@ import useAuthStore from "../Store/AuthStore";
 import React from "react";
 
 const ProtectedRoute = ({ children }) => {
-    const { user, adminToken } = useAuthStore();
+    const { user, adminToken,isAdmin } = useAuthStore();
 
-    if (!user) {
+    if (!user && !isAdmin) {
         return <Navigate to="/userlogin" replace />;
     }
 

@@ -34,8 +34,8 @@ export const userLogin = asyncHandler(async (req, res) => {
         throw new ErrorResponse(401, 7000, "invalid credentials");
     }
 
-    const accessToken = generateAccessToken(user._id);
-    const refreshToken = generateRefreshToken(user._id);
+    const accessToken = await generateAccessToken(user._id);
+    const refreshToken = await generateRefreshToken(user._id);
 
     const cookieOptions = {
         httpOnly: true,

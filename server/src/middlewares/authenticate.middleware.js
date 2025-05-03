@@ -5,10 +5,10 @@ import { User } from "../models/index.js";
 export const authenticate = asyncHandler(async (req, _, next) => {
     const token =
         req.cookies.access_token ||
-        req.headers("Authorization")?.replace("Bearer ", "");
+        req.headers["Authorization"]?.replace("Bearer ", "");
 
     if (!token) {
-        throw new ErrorResponse("401", 6001, "token is required");
+        throw new ErrorResponse(401, 6001, "token is required");
     }
 
     const secret = process.env.AUTH_ACCESS_TOKEN_SECRET;
@@ -20,8 +20,9 @@ export const authenticate = asyncHandler(async (req, _, next) => {
         next();
     } catch (error) {
         if (error.message === "jwt expired") {
-            throw new ErrorResponse("401", 6002, "token expired");
+            throw new ErrorResponse(401, 6002, "token expired");
         }
-        throw new ErrorResponse("401", 6003, "invalid token");
+        console.log(error)
+        throw new ErrorResponse(401, 6003, "invalid token");
     }
 });

@@ -16,12 +16,20 @@ export const adminLogin = asyncHandler(async (req, res) => {
     const adminPassword = process.env.ADMIN_PASSWORD;
 
     if (email !== adminEmail || password !== adminPassword) {
-        return new ErrorResponse(401, 6001, "Invalid admin credentials");
+        throw new ErrorResponse(401, 6001, "Invalid admin credentials");
     }
+    const admin = {
+        _id: 1,
+        email: "admin",
+        role: "admin",
+        created_at: "N/A",
+        updated_at: "N/A",
+    };
 
     return res.status(200).json(
-        new SuccessResponse(200,"Admin Login successful", {
+        new SuccessResponse(200, "Admin Login successful", {
             token: process.env.ADMIN_TOKEN,
+            admin,
         }),
     );
 });

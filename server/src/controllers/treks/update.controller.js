@@ -6,7 +6,9 @@ import {
 } from "../../lib/index.js";
 import { Trek } from "../../models/trek.model.js";
 export const updateTrek = asyncHandler(async (req, res) => {
-    const trekId = req.params.trekId;
+    const trekId = req.params?.id;
+
+    console.log(trekId)
 
     if (!isValidObjectId(trekId)) {
         throw new ErrorResponse(400, 6000, "trekId is not valid");

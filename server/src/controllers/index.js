@@ -1,5 +1,6 @@
 import { verifyAdminToken } from "./admin/verifyAdminToken.controller.js";
 import { userLogin } from "./auth/login.controller.js";
+import { logout } from "./auth/logout.controller.js";
 import { signup } from "./auth/signup.controller.js";
 import { verifyUserToken } from "./auth/verifyUserToken.controller.js";
 
@@ -43,4 +44,5 @@ export {
     updateCategory,
     verifyUserToken,
     verifyAdminToken,
+    logout,
 };
