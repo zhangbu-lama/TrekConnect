@@ -40,5 +40,10 @@ import { categoriesRouter } from "./routes/index.js";
 // categories router
 app.use("/api/categories", categoriesRouter);
 
+
+//Bookings router
+import { bookingsRouter } from "./routes/index.js";
+app.use("/api/bookings", bookingsRouter);
+
 // error handling middleware
 app.use(errorReponseHandler);
