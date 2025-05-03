@@ -20,7 +20,6 @@ const childVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-// Highlight Image component
 const HighlightImage = ({ image, alt }) => (
   <motion.div
     className="relative h-48 rounded-lg overflow-hidden shadow-md"
