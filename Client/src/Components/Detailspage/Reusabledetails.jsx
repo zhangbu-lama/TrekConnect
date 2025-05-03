@@ -11,6 +11,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useParams } from "react-router-dom";
 import { useDetailsByPlace } from "../Hooks/useDetails";
+import { Link } from "react-router-dom";
 
 const BASE_URL = "http://127.0.0.1:8000";
 
@@ -203,6 +204,15 @@ const DetailsPage = () => {
                             </div>
                         </div>
                     </motion.div>
+                    <div className="flex items-center gap-3 bg-gray/20 px-4 py-2 rounded-full mt-12">
+                                    <Star className="w-6 h-6 text-yellow-400" />
+                                    <Link to='/bookingform'>
+                                        <span className="text-gray-700 text-lg font-semibold">
+                                            Book now
+                                        </span>
+                                    </Link>
+
+                                </div>
                 </div>
             ))}
         </motion.div>
