@@ -12,7 +12,7 @@ const ESewaPayment = () => {
         product_service_charge: 0,
         product_delivery_charge: 0,
         success_url: "http://localhost:5173/success",
-        failure_url: "http://localhost:5173/failure",
+        failure_url: "http://localhost:5173/failed",
         signed_field_names: "total_amount,transaction_uuid,product_code",
         signature: "",
         secret: "8gBm/:&EnhH.1/q",
@@ -54,6 +54,8 @@ const ESewaPayment = () => {
                     </h1>
                     <p className="text-center text-blue-100 mt-2">
                         Secure Online Payment Gateway
+
+                        For your booking pay 20000 NPR
                     </p>
                 </div>
 

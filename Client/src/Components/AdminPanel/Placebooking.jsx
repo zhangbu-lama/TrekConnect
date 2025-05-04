@@ -81,8 +81,8 @@ const Placebooking = () => {
                       <td className="py-4 px-6 text-gray-600">{booking.travel_date}</td>
                       <td className="py-4 px-6 text-gray-600">{booking.group_size}</td>
                       <td className="py-4 px-6 text-gray-600">
-                        <span className="px-3 py-1 rounded-full text-sm bg-yellow-200 text-yellow-800">
-                          Pending
+                        <span className="px-3 py-1 rounded-full text-sm bg-green-200 text-green-800">
+                        Success
                         </span>
                       </td>
                     </motion.tr>

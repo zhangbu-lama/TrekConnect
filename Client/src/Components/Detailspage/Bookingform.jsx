@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useCreateBooking } from "../Hooks/useBooking"; 
+import { useCreateBooking } from "../Hooks/useBooking";
+import { useNavigate } from "react-router-dom";
 
 const BookingForm = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
-    email: "",
+    email_address: "",
     phone: "",
     start_date: "",
     travel_date: "",
@@ -16,7 +19,7 @@ const BookingForm = () => {
     special_requirements: "",
   });
 
-  const { mutate: addBooking, isLoading } = useCreateBooking(); 
+  const { mutate: addBooking, isLoading } = useCreateBooking();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,15 +29,8 @@ const BookingForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const bookingData = {
-      customer: `${formData.first_name} ${formData.last_name}`,
-      email: formData.email,
-      phone: formData.phone,
-      start_date: formData.start_date,
-      travel_date: formData.travel_date,
-      seats: parseInt(formData.group_size, 10),
-      destination: formData.destination,
-      special_requirements: formData.special_requirements,
-      status: "Pending", 
+      ...formData,
+      status: "Pending",
     };
 
     addBooking(bookingData, {
@@ -43,7 +39,7 @@ const BookingForm = () => {
         setFormData({
           first_name: "",
           last_name: "",
-          email: "",
+          email_address: "",
           phone: "",
           start_date: "",
           travel_date: "",
@@ -51,6 +47,11 @@ const BookingForm = () => {
           destination: "",
           special_requirements: "",
         });
+
+        // Redirect to /esewapayment after short delay
+        setTimeout(() => {
+          navigate("/esewapayment");
+        }, 1500);
       },
       onError: (error) => {
         toast.error(`Failed to submit booking: ${error.message}`);
@@ -89,9 +90,9 @@ const BookingForm = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <input
               type="email"
-              name="email"
+              name="email_address"
               placeholder="Email"
-              value={formData.email}
+              value={formData.email_address}
               onChange={handleChange}
               className="input-style"
               required
@@ -166,7 +167,7 @@ const BookingForm = () => {
           <div className="text-center">
             <button
               type="submit"
-              className="bg-green-500 hover:bg-green-６00 text-white font-semibold px-8 py-2 rounded-md shadow-md transition"
+              className="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-2 rounded-md shadow-md transition"
               disabled={isLoading}
             >
               {isLoading ? "Submitting..." : "Submit Booking"}

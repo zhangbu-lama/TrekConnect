@@ -20,3 +20,4 @@ export const getBookingByUserId = async (userId) => {
   const response = await axiosInstance.get(`/bookings/user/${userId}`);
   return response.data.data;
 };
+
