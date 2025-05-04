@@ -1,59 +1,129 @@
-import React from 'react';
-import CryptoJS from 'crypto-js';
+import React from "react";
+import CryptoJS from "crypto-js";
+import { v4 as uuidv4 } from "uuid";
 
 const ESewaPayment = () => {
-  const handlePayment = () => {
-    const total_amount = '100';
-    const transaction_uuid = 'txn1234567890';
-    const product_code = 'EPAYTEST';
-    const signed_field_names = 'total_amount,transaction_uuid,product_code';
-    const signed_data = `${total_amount},${transaction_uuid},${product_code}`;
-    const secret = '8gBm/ulzjrU='; // UAT secret key (DON'T expose in production)
-
-    const signature = CryptoJS.HmacSHA256(signed_data, secret);
-    const signatureBase64 = CryptoJS.enc.Base64.stringify(signature);
-
-    // Create and submit form
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'https://rc-epay.esewa.com.np/api/epay/main/v2/form';
-
-    const fields = {
-      amount: '100',
-      tax_amount: '0',
-      total_amount,
-      transaction_uuid,
-      product_code,
-      product_service_charge: '0',
-      product_delivery_charge: '0',
-      success_url: 'http://localhost:5173/success',
-      failure_url: 'http://localhost:5173/failed',
-      signed_field_names,
-      signature: signatureBase64,
-    };
-
-    Object.entries(fields).forEach(([name, value]) => {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = name;
-      input.value = value;
-      form.appendChild(input);
+    const [formData, setFormData] = React.useState({
+        amount: 10,
+        tax_amount: 0,
+        total_amount: 10,
+        transaction_uuid: uuidv4(),
+        product_code: "EPAYTEST",
+        product_service_charge: 0,
+        product_delivery_charge: 0,
+        success_url: "http://localhost:5173/success",
+        failure_url: "http://localhost:5173/failure",
+        signed_field_names: "total_amount,transaction_uuid,product_code",
+        signature: "",
+        secret: "8gBm/:&EnhH.1/q",
     });
 
-    document.body.appendChild(form);
-    form.submit();
-  };
+    const generateSignature = (
+        total_amount,
+        transaction_uuid,
+        product_code,
+        secret,
+    ) => {
+        const hashString = `total_amount=${total_amount},transaction_uuid=${transaction_uuid},product_code=${product_code}`;
+        const hash = CryptoJS.HmacSHA256(hashString, secret);
+        return CryptoJS.enc.Base64.stringify(hash);
+    };
 
-  return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <button
-        onClick={handlePayment}
-        className="px-6 py-3 bg-green-500 text-white font-semibold rounded hover:bg-green-600"
-      >
-        Pay with eSewa
-      </button>
-    </div>
-  );
+    React.useEffect(() => {
+        const { amount, transaction_uuid, product_code, secret } = formData;
+        const signature = generateSignature(
+            amount,
+            transaction_uuid,
+            product_code,
+            secret,
+        );
+        setFormData((prev) => ({ ...prev, signature }));
+    }, [formData.amount]);
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 flex items-center justify-center">
+            <div className="w-[450px] mx-auto bg-white rounded-xl shadow-2xl overflow-hidden ">
+                {/* Header Section */}
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6">
+                    <h1 className="text-2xl font-bold text-white text-center">
+                        <img
+                            src="/esewa.png"
+                            alt="eSewa Logo"
+                            className="h-12 mx-auto"
+                        />
+                    </h1>
+                    <p className="text-center text-blue-100 mt-2">
+                        Secure Online Payment Gateway
+                    </p>
+                </div>
+
+                {/* Payment Form */}
+                <form
+                    action="https://rc-epay.esewa.com.np/api/epay/main/v2/form"
+                    method="POST"
+                    className="p-8 space-y-6"
+                >
+                    {/* Amount Input */}
+                    <div>
+                        <label
+                            htmlFor="amount"
+                            className="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                            Payment Amount (NPR)
+                        </label>
+                        <div className="relative">
+                            <input
+                                type="number"
+                                id="amount"
+                                name="amount"
+                                value={formData.amount}
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        amount: e.target.value,
+                                        total_amount: e.target.value,
+                                    })
+                                }
+                                className="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                placeholder="Enter amount"
+                                min="1"
+                                required
+                            />
+                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                NPR
+                            </span>
+                        </div>
+                        <p className="text-sm text-gray-500 mt-2">
+                            Enter the amount you want to pay
+                        </p>
+                    </div>
+
+                    {/* Hidden Fields */}
+                    {Object.entries(formData).map(([name, value]) => {
+                        if (name === "amount") return null;
+                        return (
+                            <input
+                                key={name}
+                                type="hidden"
+                                id={name}
+                                name={name}
+                                value={value}
+                                required
+                            />
+                        );
+                    })}
+
+                    {/* Submit Button */}
+                    <button
+                        type="submit"
+                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+                    >
+                        Proceed to Payment
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
 };
 
 export default ESewaPayment;

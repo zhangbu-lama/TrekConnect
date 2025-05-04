@@ -76,6 +76,9 @@ function App() {
             <Routes>
                 <Route path="/success" element={<Sucess />} />
                 <Route path="/failed" element={<Failed />} />
+                <Route path="/esewapayment" element={<ESewaPayment />} />
+
+
                 <Route path="/" element={<Routing />} />
                 <Route path="/trek" element={<Reusable />} />
                 <Route path="/details/:id" element={<Reusabledetails />} />
@@ -89,10 +92,6 @@ function App() {
                 <Route path="/userlogin" element={<UserLoginPage />} />
                 <Route path="/userregister" element={<UserRegisterPage />} />
 
-
-
-
-                <Route path="/esewapayment" element={<ESewaPayment />} />
 
                 {/* Admin Routes */}
                 <Route
