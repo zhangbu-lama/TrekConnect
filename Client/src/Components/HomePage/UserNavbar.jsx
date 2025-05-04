@@ -66,7 +66,6 @@ const UserNavbar = () => {
                     {user && (
                         <div className="hidden lg:flex items-center space-x-3">
                             <span className="text-gray-800 text-sm">{user.name}</span>
-                            <img src={user.image} alt="Avatar" className="w-8 h-8 rounded-full" />
                         </div>
                     )}
 

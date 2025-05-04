@@ -110,11 +110,11 @@ const Sidebar = () => {
                         icon={BookOpen}
                         label="Show Place Bookings"
                     />
-                    <SidebarLink
+                    {/* <SidebarLink
                         to="/productbooked"
                         icon={ShoppingCart}
                         label="Show Product Bookings"
-                    />
+                    /> */}
                 </nav>
 
                 {/* Admin Footer */}
