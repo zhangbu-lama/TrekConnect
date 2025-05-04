@@ -40,154 +40,182 @@ import UserLoginPage from "./Components/UserAuth/Userlogin.jsx";
 import UserRegisterPage from "./Components/UserAuth/UserRegister.jsx";
 import ProtectedRoute from "./Components/Auth/ProtectedRoute.jsx";
 
+
+//payment integration
+
+import Sucess from "./Components/PaymentIntegration/Success.jsx";
+import Failed from "./Components/PaymentIntegration/Failed.jsx";
+import ESewaPayment from "./Components/PaymentIntegration/ESewaPayment.jsx";
+
 function App() {
-  const { user, adminToken, initializing, initializeAuth } = useAuthStore();
+    const { user, adminToken, initializing, initializeAuth } = useAuthStore();
 
-  useEffect(() => {
-    initializeAuth();
-  }, [initializeAuth]);
+    useEffect(() => {
+        initializeAuth();
+    }, [initializeAuth]);
 
-  if (initializing) {
+    if (initializing) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-100">
+                <div className="text-gray-800 text-lg font-semibold animate-pulse">
+                    Loading...
+                </div>
+            </div>
+        );
+    }
+
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-gray-800 text-lg font-semibold animate-pulse">
-          Loading...
-        </div>
-      </div>
+        <Router>
+            {adminToken ? (
+                <AdminNavbar />
+            ) : user ? (
+                <UserNavbar />
+            ) : (
+                <MainNavbar />
+            )}
+            <Routes>
+                <Route path="/success" element={<Sucess />} />
+                <Route path="/failed" element={<Failed />} />
+                <Route path="/" element={<Routing />} />
+                <Route path="/trek" element={<Reusable />} />
+                <Route path="/details/:id" element={<Reusabledetails />} />
+                <Route path="/bouldering" element={<Bouldering />} />
+                <Route path="/bookproduct" element={<ProductBooking />} />
+                <Route path="/bookproduct/:id" element={<ProductBooking />} />
+                <Route path="/down" element={<Down />} />
+
+                <Route path="/adminlogin" element={<LoginPage />} />
+                <Route path="/admin/register" element={<RegisterPage />} />
+                <Route path="/userlogin" element={<UserLoginPage />} />
+                <Route path="/userregister" element={<UserRegisterPage />} />
+
+
+
+
+                <Route path="/esewapayment" element={<ESewaPayment />} />
+
+                {/* Admin Routes */}
+                <Route
+                    path="/admin"
+                    element={
+                        <ProtectedRoute requiredRole="admin">
+                            <Dashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/dashboard"
+                    element={
+                        <ProtectedRoute requiredRole="admin">
+                            <Dashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/addproduct"
+                    element={
+                        <ProtectedRoute requiredRole="admin">
+                            <AdminPanel />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/productbooking"
+                    element={
+                        <ProtectedRoute requiredRole="admin">
+                            <ShowBooking />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/page"
+                    element={
+                        <ProtectedRoute requiredRole="admin">
+                            <AddPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/add-details"
+                    element={
+                        <ProtectedRoute requiredRole="admin">
+                            <AddDetails />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/add-category"
+                    element={
+                        <ProtectedRoute requiredRole="admin">
+                            <AddCategory />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/addlocation"
+                    element={
+                        <ProtectedRoute requiredRole="admin">
+                            <Location />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/show-bookings"
+                    element={
+                        <ProtectedRoute requiredRole="admin">
+                            <ShowBookings />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* User Routes */}
+                <Route
+                    path="/placebooked"
+                    element={
+                        <ProtectedRoute requiredRole="user">
+                            <Placebook />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/bookingform"
+                    element={
+                        <ProtectedRoute requiredRole="user">
+                            <BookingFormPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/productbooked"
+                    element={
+                        <ProtectedRoute requiredRole="user">
+                            <Productbooked />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/user"
+                    element={
+                        <ProtectedRoute requiredRole="user">
+                            <UserSidebar />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/userlayout"
+                    element={
+                        <ProtectedRoute requiredRole="user">
+                            <UserLayout />
+                        </ProtectedRoute>
+                    }
+                />
+            </Routes>
+        </Router>
     );
-  }
+}
 
-  return (
-    <Router>
-      {adminToken ? <AdminNavbar /> : user ? <UserNavbar /> : <MainNavbar />}
-      <Routes>
-        <Route path="/" element={<Routing />} />
-        <Route path="/trek" element={<Reusable />} />
-        <Route path="/details/:id" element={<Reusabledetails />} />
-        <Route path="/bookingform" element={<BookingFormPage />} />
-        <Route path="/bouldering" element={<Bouldering />} />
-        <Route path="/bookproduct" element={<ProductBooking />} />
-        <Route path="/bookproduct/:id" element={<ProductBooking />} />
-        <Route path="/down" element={<Down />} />
-
-        <Route path="/admin/login" element={<LoginPage />} />
-        <Route path="/admin/register" element={<RegisterPage />} />
-        <Route path="/userlogin" element={<UserLoginPage />} />
-        <Route path="/userregister" element={<UserRegisterPage />} />
-
-         {/* Admin Routes */}
-         <Route
-           path="/admin"
-           element={
-             <ProtectedRoute requiredRole="admin">
-               <Dashboard />
-             </ProtectedRoute>
-           }
-         />
-         <Route
-           path="/dashboard"
-           element={
-             <ProtectedRoute requiredRole="admin">
-               <Dashboard />
-             </ProtectedRoute>
-           }
-         />
-         <Route
-           path="/addproduct"
-           element={
-             <ProtectedRoute requiredRole="admin">
-              <AdminPanel />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/productbooking"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <ShowBooking />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/page"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <AddPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/add-details"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <AddDetails />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/add-category"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <AddCategory />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/addlocation"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <Location />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/show-bookings"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <ShowBookings />
-            </ProtectedRoute>
-          }
-         />
-
-         {/* User Routes */}
-         <Route
-           path="/placebooked"
-          element={
-            <ProtectedRoute requiredRole="user">
-              <Placebook />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/productbooked"
-          element={
-            <ProtectedRoute requiredRole="user">
-              <Productbooked />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/user"
-          element={
-            <ProtectedRoute requiredRole="user">
-              <UserSidebar />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/userlayout"
-          element={
-            <ProtectedRoute requiredRole="user">
-              <UserLayout />
-            </ProtectedRoute>
-          }
-        />
-       </Routes>
-     </Router>
-   );
- }
-
- export default App;
+export default App;
 
 // import "./App.css";
 // import React, { useEffect } from "react";

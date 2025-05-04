@@ -17,7 +17,7 @@ const AdminNavbar = () => {
   };
 
   const navItems = [
-    { name: 'View Admin Dashboard', path: '/admin/dashboard' },
+    { name: 'View Admin Dashboard', path: '/admin' },
     { name: 'Bouldering', path: '/bouldering' },
   ];
 

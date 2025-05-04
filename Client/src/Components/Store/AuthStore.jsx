@@ -54,7 +54,6 @@ const useAuthStore = create((set) => ({
                 credentials,
             );
             const res = response.data.data;
-            console.log(res);
             set({
                 loading: false,
                 user: res.admin,
@@ -63,7 +62,6 @@ const useAuthStore = create((set) => ({
             });
             return response.data.data;
         } catch (error) {
-            console.error("Admin login error:", error);
             let errorMessage = "Failed to log in as admin";
             if (error.response) {
                 errorMessage =
@@ -94,11 +92,20 @@ const useAuthStore = create((set) => ({
     initializeAuth: async () => {
         set({ initializing: true, error: null });
         try {
+            const token = localStorage.getItem('authToken'); 
+            if (!token) {
+                set({ initializing: false, user: null, adminToken: null });
+                return;
+            }
+
             const response = await axios.get(
                 "http://localhost:8000/api/v1/auth/verify-user-token",
                 {
+                    headers: {
+                        Authorization: `Bearer ${token}`,  
+                    },
                     withCredentials: true,
-                },
+                }
             );
             set({ user: response.data.data });
         } catch (err) {

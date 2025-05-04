@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../Store/AuthStore";
 import React from "react";
@@ -8,6 +8,7 @@ const Login = () => {
         email_address: "",
         password: "",
     });
+
     const { user, login, loading, error } = useAuthStore();
     const navigate = useNavigate();
 
@@ -19,14 +20,18 @@ const Login = () => {
         e.preventDefault();
         try {
             await login(formData);
-            navigate("/user");
+            // No need to navigate here – it'll be handled by useEffect below
         } catch (err) {
             console.error(err);
         }
     };
-    if (user) {
-        return navigate("/user");
-    }
+
+    // ✅ Safe redirect after login
+    useEffect(() => {
+        if (user) {
+            navigate("/user");
+        }
+    }, [user, navigate]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">

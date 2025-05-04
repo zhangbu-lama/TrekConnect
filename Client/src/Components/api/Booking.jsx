@@ -1,13 +1,14 @@
 import axiosInstance from './Index';
 
 export const createBooking = async (bookingData) => {
-  const response = await axiosInstance.post('/bookings/create', bookingData);
-  return response.data.data;
-};
+    const response = await axiosInstance.post('/bookings/create', bookingData);
+    return response.data.data;
+  };
+  
 
 export const getAllBookings = async () => {
-    const res = await axiosInstance.get('/bookings/all');
-    return res.data.data;
+    const response = await axiosInstance.get('/bookings/all');
+    return response.data.data;
   };
 
 export const getBookingById = async (id) => {

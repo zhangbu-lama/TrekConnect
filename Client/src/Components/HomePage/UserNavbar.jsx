@@ -2,17 +2,18 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import useAuthStore from "../Store/AuthStore";
+import { toast } from "react-toastify"; // Add toast notifications for logout feedback
 
 const UserNavbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const { logout, user } = useAuthStore();
-    console.log(user)
     const navigate = useNavigate();
 
     const toggleMenu = () => setIsOpen(!isOpen);
 
     const handleLogout = () => {
         logout();
+        toast.success("You have successfully logged out."); // Display success toast
         navigate("/");
         setIsOpen(false);
     };
@@ -35,7 +36,6 @@ const UserNavbar = () => {
                         Nexus
                     </NavLink>
 
-                    {/* Desktop Menu */}
                     <ul className="hidden lg:flex space-x-8 items-center">
                         {navItems.map((item) => (
                             <li key={item.name}>
@@ -63,12 +63,19 @@ const UserNavbar = () => {
                         </li>
                     </ul>
 
-                    {/* Mobile Hamburger Icon */}
+                    {user && (
+                        <div className="hidden lg:flex items-center space-x-3">
+                            <span className="text-gray-800 text-sm">{user.name}</span>
+                            <img src={user.image} alt="Avatar" className="w-8 h-8 rounded-full" />
+                        </div>
+                    )}
+
                     <button
                         onClick={toggleMenu}
                         className="lg:hidden text-gray-800 hover:text-blue-600 transition-all duration-300 hover:scale-110"
                         aria-label="Toggle menu"
                         aria-expanded={isOpen}
+                        aria-controls="mobile-menu"
                     >
                         {isOpen ? (
                             <X className="w-6 h-6" />
@@ -80,6 +87,7 @@ const UserNavbar = () => {
 
                 {/* Mobile Menu Dropdown */}
                 <div
+                    id="mobile-menu"
                     className={`lg:hidden overflow-hidden transition-all duration-500 ease-in-out ${
                         isOpen
                             ? "max-h-screen opacity-100 py-4"

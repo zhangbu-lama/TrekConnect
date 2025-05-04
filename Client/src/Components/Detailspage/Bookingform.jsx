@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { createBooking } from "../api/Booking"; // Import the correct hook
+import { useCreateBooking } from "../Hooks/useBooking"; 
 
 const BookingForm = () => {
   const [formData, setFormData] = useState({
@@ -16,7 +16,7 @@ const BookingForm = () => {
     special_requirements: "",
   });
 
-  const { mutate: addBooking, isLoading } = createBooking(); // Use the correct hook
+  const { mutate: addBooking, isLoading } = useCreateBooking(); 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,7 +25,6 @@ const BookingForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Prepare data for the API
     const bookingData = {
       customer: `${formData.first_name} ${formData.last_name}`,
       email: formData.email,
@@ -35,14 +34,12 @@ const BookingForm = () => {
       seats: parseInt(formData.group_size, 10),
       destination: formData.destination,
       special_requirements: formData.special_requirements,
-      status: "Pending", // Default status for new bookings
+      status: "Pending", 
     };
 
-    // Submit to backend API
     addBooking(bookingData, {
       onSuccess: () => {
         toast.success("Booking submitted successfully!");
-        // Reset form after successful submission
         setFormData({
           first_name: "",
           last_name: "",
@@ -68,7 +65,6 @@ const BookingForm = () => {
         <p className="text-center text-gray-500 mb-8">Fill in the details below to confirm your reservation.</p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Name Fields */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <input
               type="text"
@@ -90,7 +86,6 @@ const BookingForm = () => {
             />
           </div>
 
-          {/* Email and Phone */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <input
               type="email"
@@ -112,7 +107,6 @@ const BookingForm = () => {
             />
           </div>
 
-          {/* Dates */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-sm text-gray-600">Start Date</label>
@@ -138,7 +132,6 @@ const BookingForm = () => {
             </div>
           </div>
 
-          {/* Group size and Destination */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <input
               type="number"
@@ -161,7 +154,6 @@ const BookingForm = () => {
             />
           </div>
 
-          {/* Special Requirements */}
           <textarea
             name="special_requirements"
             rows="4"
